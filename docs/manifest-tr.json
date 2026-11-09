@@ -1,0 +1,28 @@
+{
+  "name": "TrackBridge firmware (Türkçe)",
+  "version": "4.0.1-tb1",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        {
+          "path": "firmware/tr/bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "firmware/tr/partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "firmware/tr/boot_app0.bin",
+          "offset": 57344
+        },
+        {
+          "path": "firmware/tr/firmware.bin",
+          "offset": 65536
+        }
+      ]
+    }
+  ]
+}

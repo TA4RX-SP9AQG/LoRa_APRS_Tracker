@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrackBridge firmware installer</title>
+  <style>
+    :root { color-scheme: light dark; --accent: #0b6e4f; --warn: #b45309; --bad: #b91c1c; }
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 46rem; margin: 0 auto; padding: 1rem; }
+    h1 { font-size: 1.6rem; margin: .2rem 0 .4rem; }
+    h2 { font-size: 1.1rem; margin: 1.6rem 0 .4rem; }
+    .card { border: 1px solid #8884; border-radius: .75rem; padding: .9rem 1rem; margin: .8rem 0; }
+    .warn { border-color: var(--warn); }
+    .bad { border-color: var(--bad); }
+    .lang button, .choice label { cursor: pointer; }
+    .lang { float: right; }
+    .lang button { border: 1px solid #8886; background: none; color: inherit; padding: .2rem .6rem; border-radius: .5rem; }
+    .lang button[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .choice { display: flex; gap: .8rem; flex-wrap: wrap; margin: .4rem 0; }
+    .choice label { border: 1px solid #8886; border-radius: .6rem; padding: .5rem .9rem; }
+    .choice input:checked + span { font-weight: 700; }
+    ol li, ul li { margin: .25rem 0; }
+    #install[hidden] { display: none; }
+    .install-btn { font: inherit; font-weight: 700; padding: .7rem 1.4rem; border: 0; border-radius: .6rem; background: var(--accent); color: #fff; cursor: pointer; }
+    code, .hash { font-family: ui-monospace, monospace; font-size: .85rem; word-break: break-all; }
+    small, .muted { opacity: .75; }
+    footer { margin-top: 2rem; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="en" aria-pressed="true">English</button>
+    <button type="button" data-lang="tr" aria-pressed="false">Türkçe</button>
+  </div>
+  <h1 data-i="title">TrackBridge firmware installer</h1>
+  <p data-i="intro" class="muted"></p>
+
+  <div class="card bad" id="untested" hidden><strong data-i="untested"></strong></div>
+
+  <h2 data-i="h_before">Before you start</h2>
+  <div class="card warn">
+    <ul>
+      <li data-i="b_board"></li>
+      <li data-i="b_browser"></li>
+      <li data-i="b_licence"></li>
+      <li data-i="b_backup"></li>
+    </ul>
+  </div>
+
+  <h2 data-i="h_lang">1. Language of the tracker</h2>
+  <div class="card">
+    <p data-i="lang_help"></p>
+    <div class="choice" role="radiogroup" aria-label="Firmware language">
+      <label><input type="radio" name="fwlang" value="en" checked> <span>English</span></label>
+      <label><input type="radio" name="fwlang" value="tr"> <span>Türkçe</span></label>
+    </div>
+    <small data-i="lang_note"></small>
+  </div>
+
+  <h2 data-i="h_install">2. Install</h2>
+  <div class="card">
+    <ol>
+      <li data-i="s_usb"></li>
+      <li data-i="s_click"></li>
+      <li data-i="s_boot"></li>
+      <li data-i="s_wait"></li>
+    </ol>
+    <label><input type="checkbox" id="ack"> <span data-i="ack"></span></label>
+    <div id="install" hidden style="margin-top:.8rem">
+      <esp-web-install-button manifest="manifest-en.json">
+        <button slot="activate" class="install-btn" data-i="btn">Install firmware</button>
+        <span slot="unsupported" data-i="unsupported"></span>
+        <span slot="not-allowed" data-i="notallowed"></span>
+      </esp-web-install-button>
+    </div>
+    <p><small id="version"></small></p>
+  </div>
+
+  <h2 data-i="h_after">3. Afterwards</h2>
+  <div class="card">
+    <ul>
+      <li data-i="a_app"></li>
+      <li data-i="a_config"></li>
+      <li data-i="a_recover"></li>
+    </ul>
+  </div>
+
+  <h2 data-i="h_files">What is written</h2>
+  <div class="card">
+    <p data-i="files_help"></p>
+    <ul id="files"></ul>
+  </div>
+
+  <footer>
+    <p data-i="legal"></p>
+    <p><a href="https://github.com/TA4RX-SP9AQG/LoRa_APRS_Tracker/tree/trackbridge" data-i="source">Source code</a> ·
+       <a href="https://github.com/richonguzman/LoRa_APRS_Tracker" data-i="upstream">Original project</a> ·
+       <a href="vendor/esp-web-tools/LICENSE">ESP Web Tools (Apache-2.0)</a></p>
+  </footer>
+
+  <script>
+    const T = {
+      en: {
+        title: 'TrackBridge firmware installer',
+        intro: 'Firmware for the Heltec Wireless Tracker that works with the TrackBridge Android app: it lets the app show battery, GPS, settings and stored messages. Everything the stock firmware does still works.',
+        untested: 'This build has not been tested on real hardware yet. Install it only if you accept that risk.',
+        h_before: 'Before you start',
+        b_board: 'Only for the Heltec Wireless Tracker (ESP32-S3). Do not use it on any other board.',
+        b_browser: 'Use Chrome or Edge on a computer (Web Serial). It does not work on phones, Firefox or Safari.',
+        b_licence: 'The tracker transmits on amateur radio frequencies. You need a valid amateur radio licence and your own callsign.',
+        b_backup: 'Recommended: write down or download your settings first (tracker web configuration page → Backup → Download).',
+        h_lang: '1. Language of the tracker',
+        lang_help: 'Choose the language of the tracker’s own screen and of its web configuration page.',
+        lang_note: 'The screen shows Turkish without special letters (g, i, s, c, o, u), the web page uses full Turkish letters.',
+        h_install: '2. Install',
+        s_usb: 'Connect the tracker to the computer with a USB data cable (not a charge-only cable).',
+        s_click: 'Tick the box below, press “Install firmware” and pick the tracker’s USB port in the list.',
+        s_boot: 'If no port appears or it cannot connect: hold the BOOT (PRG) button, plug the USB cable in (or tap RST), release, and try again.',
+        s_wait: 'Wait until it says the installation is complete. Do not unplug the tracker meanwhile. It restarts by itself.',
+        ack: 'I have a valid amateur radio licence, this is a Heltec Wireless Tracker, and I understand that this replaces the tracker’s firmware.',
+        btn: 'Install firmware',
+        unsupported: 'This browser cannot flash devices. Use Chrome or Edge on a computer.',
+        notallowed: 'Flashing needs a secure page (https).',
+        h_after: '3. Afterwards',
+        a_app: 'In the TrackBridge app: Connection tab → connect → “Tracker device”. Battery, GPS, settings and stored messages appear there. If the app still says the firmware is not recognised, press “I just installed it, check again”.',
+        a_config: 'Your settings (callsign, beacons, frequency) are kept. If the tracker starts as NOCALL, enter them again on its web configuration page.',
+        a_recover: 'If something goes wrong the tracker cannot be bricked by this: hold BOOT while plugging in the USB cable and install again.',
+        h_files: 'What is written',
+        files_help: 'These four files are written to the tracker’s flash. The settings and messages area is not touched. Checksums (SHA-256):',
+        legal: 'Based on LoRa APRS Tracker by Ricardo Guzman (CA2RXU) and contributors, licensed GPL-3.0-or-later. This build is independent and not endorsed by the original authors. Provided without warranty; you are responsible for what your station transmits.',
+        source: 'Source code', upstream: 'Original project',
+        version: 'Version', built: 'built', tested: 'tested on hardware',
+        yes: 'yes', no: 'no',
+      },
+      tr: {
+        title: 'TrackBridge firmware yükleyici',
+        intro: 'Heltec Wireless Tracker için TrackBridge Android uygulamasıyla çalışan firmware: uygulamanın pil, GPS, ayarlar ve cihazdaki mesajları göstermesini sağlar. Orijinal firmware’in yaptığı her şey çalışmaya devam eder.',
+        untested: 'Bu sürüm henüz gerçek cihazda denenmedi. Yalnızca bu riski kabul ediyorsanız yükleyin.',
+        h_before: 'Başlamadan önce',
+        b_board: 'Yalnızca Heltec Wireless Tracker (ESP32-S3) içindir. Başka bir karta yüklemeyin.',
+        b_browser: 'Bilgisayarda Chrome veya Edge kullanın (Web Serial). Telefonda, Firefox’ta veya Safari’de çalışmaz.',
+        b_licence: 'Tracker amatör telsiz frekanslarında yayın yapar. Geçerli bir amatör telsiz lisansınız ve kendi çağrı işaretiniz olmalı.',
+        b_backup: 'Önerilir: önce ayarlarınızı not alın ya da indirin (tracker’ın web ayar sayfası → Yedek → İndir).',
+        h_lang: '1. Tracker dili',
+        lang_help: 'Tracker’ın kendi ekranının ve web ayar sayfasının dilini seçin.',
+        lang_note: 'Ekranda Türkçe özel harfler (ğ, ı, ş, ç, ö, ü) olmadan gösterilir; web sayfasında tam Türkçe harfler kullanılır.',
+        h_install: '2. Yükle',
+        s_usb: 'Tracker’ı bilgisayara USB veri kablosuyla bağlayın (yalnızca şarj kablosu olmaz).',
+        s_click: 'Aşağıdaki kutuyu işaretleyin, “Firmware yükle”ye basın ve listeden tracker’ın USB portunu seçin.',
+        s_boot: 'Port görünmezse ya da bağlanamazsa: BOOT (PRG) düğmesini basılı tutarak USB kabloyu takın (veya RST’ye dokunun), bırakın ve tekrar deneyin.',
+        s_wait: 'Yükleme tamamlandı yazana kadar bekleyin, bu sırada tracker’ı çıkarmayın. Kendiliğinden yeniden başlar.',
+        ack: 'Geçerli bir amatör telsiz lisansım var, bu bir Heltec Wireless Tracker ve tracker’ın firmware’inin değişeceğini anlıyorum.',
+        btn: 'Firmware yükle',
+        unsupported: 'Bu tarayıcı cihaz yazamaz. Bilgisayarda Chrome veya Edge kullanın.',
+        notallowed: 'Yükleme için güvenli sayfa (https) gerekir.',
+        h_after: '3. Sonrasında',
+        a_app: 'TrackBridge uygulamasında: Bağlantı sekmesi → bağlan → “Tracker cihazı”. Pil, GPS, ayarlar ve cihazdaki mesajlar orada görünür. Uygulama hâlâ firmware’i tanımıyorsa “Yazılımı yeni yükledim, yeniden kontrol et”e basın.',
+        a_config: 'Ayarlarınız (çağrı işareti, beacon’lar, frekans) korunur. Tracker NOCALL olarak açılırsa web ayar sayfasından tekrar girin.',
+        a_recover: 'Bir şey ters giderse bu işlemle tracker bozulmaz (brick olmaz): USB’yi BOOT basılıyken takıp yeniden yükleyin.',
+        h_files: 'Neler yazılır',
+        files_help: 'Bu dört dosya tracker’ın flash belleğine yazılır. Ayarların ve mesajların tutulduğu bölüme dokunulmaz. Sağlama toplamları (SHA-256):',
+        legal: 'Ricardo Guzman (CA2RXU) ve katkıda bulunanların LoRa APRS Tracker projesine dayanır, GPL-3.0-or-later lisanslıdır. Bu sürüm bağımsızdır, orijinal yazarlar tarafından onaylanmış değildir. Garanti verilmez; istasyonunuzun yayınlarından siz sorumlusunuz.',
+        source: 'Kaynak kod', upstream: 'Orijinal proje',
+        version: 'Sürüm', built: 'derleme', tested: 'cihazda denendi',
+        yes: 'evet', no: 'hayır',
+      },
+    };
+
+    const button = document.querySelector('esp-web-install-button');
+    let uiLang = (navigator.language || 'en').toLowerCase().startsWith('tr') ? 'tr' : 'en';
+    let info = null;
+
+    function render() {
+      const d = T[uiLang];
+      document.documentElement.lang = uiLang;
+      document.title = d.title;
+      document.querySelectorAll('[data-i]').forEach((el) => { if (d[el.dataset.i]) el.textContent = d[el.dataset.i]; });
+      document.querySelectorAll('.lang button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === uiLang)));
+      document.getElementById('untested').hidden = !info || info.tested_on_hardware === true;
+      if (info) {
+        document.getElementById('version').textContent =
+          d.version + ' ' + info.version + ' · ' + d.built + ' ' + info.built + ' · ' + d.tested + ': ' + (info.tested_on_hardware ? d.yes : d.no);
+        const fw = document.querySelector('input[name=fwlang]:checked').value;
+        const list = document.getElementById('files');
+        list.replaceChildren();
+        for (const f of info.files[fw]) {
+          const li = document.createElement('li');
+          li.innerHTML = '<code></code><br><span class="hash"></span>';
+          li.querySelector('code').textContent = f.name + ' (' + f.size + ' B, 0x' + f.offset.toString(16) + ')';
+          li.querySelector('.hash').textContent = f.sha256;
+          list.appendChild(li);
+        }
+      }
+    }
+
+    function setManifest() {
+      const fw = document.querySelector('input[name=fwlang]:checked').value;
+      button.setAttribute('manifest', 'manifest-' + fw + '.json');
+      render();
+    }
+
+    document.querySelectorAll('.lang button').forEach((b) => b.addEventListener('click', () => { uiLang = b.dataset.lang; render(); }));
+    document.querySelectorAll('input[name=fwlang]').forEach((r) => r.addEventListener('change', setManifest));
+    document.getElementById('ack').addEventListener('change', (e) => { document.getElementById('install').hidden = !e.target.checked; });
+
+    // The firmware language follows the page language until the user picks one.
+    if (uiLang === 'tr') document.querySelector('input[name=fwlang][value=tr]').checked = true;
+    fetch('firmware/version.json').then((r) => r.json()).then((j) => { info = j; setManifest(); }).catch(() => render());
+    setManifest();
+  </script>
+  <script type="module" src="vendor/esp-web-tools/install-button.js"></script>
+</body>
+</html>
