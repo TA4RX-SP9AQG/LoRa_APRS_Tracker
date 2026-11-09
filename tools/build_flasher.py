@@ -32,6 +32,11 @@ APP_OFFSET, APP_SIZE = 0x10000, 0x300000
 SPIFFS_OFFSET, SPIFFS_SIZE = 0x310000, 0xE0000   # settings and messages: must stay where the stock firmware keeps them
 
 
+def write_lf(path, text):
+    # always LF, also on Windows (a CRLF checksum list would not verify on Linux)
+    Path(path).write_bytes(text.encode("utf-8"))
+
+
 def fail(message):
     sys.exit("REFUSED: " + message)
 
@@ -119,18 +124,18 @@ def main():
                 }
             ],
         }
-        (DOCS / ("manifest-" + lang + ".json")).write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + chr(10), encoding="utf-8")
+        write_lf((DOCS / ("manifest-" + lang + ".json")), json.dumps(manifest, indent=2, ensure_ascii=False) + chr(10))
     info = {
         "version": version,
         "built": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"),
         "tested_on_hardware": bool(tested or previous.get("tested_on_hardware", False)),
         "files": files_info,
     }
-    (firmware_dir / "version.json").write_text(json.dumps(info, indent=2) + chr(10), encoding="utf-8")
+    write_lf((firmware_dir / "version.json"), json.dumps(info, indent=2) + chr(10))
     sums = chr(10).join(
         sha256_line for lang in ENVS for sha256_line in (p["sha256"] + "  firmware/" + lang + "/" + p["name"] for p in files_info[lang])
     )
-    (firmware_dir / "SHA256SUMS.txt").write_text(sums + chr(10), encoding="utf-8")
+    write_lf((firmware_dir / "SHA256SUMS.txt"), sums + chr(10))
 
     if "--ewt" in sys.argv:
         src = Path(sys.argv[sys.argv.index("--ewt") + 1])
@@ -140,7 +145,7 @@ def main():
         shutil.copytree(src / "dist" / "web", dest)
         shutil.copy(src / "LICENSE", dest / "LICENSE")
         pkg = json.loads((src / "package.json").read_text(encoding="utf-8"))
-        (dest / "VERSION.txt").write_text("esp-web-tools " + pkg["version"] + " (Apache-2.0), unmodified" + chr(10), encoding="utf-8")
+        write_lf((dest / "VERSION.txt"), "esp-web-tools " + pkg["version"] + " (Apache-2.0), unmodified" + chr(10))
     print("OK: version", version, "| tested_on_hardware =", info["tested_on_hardware"])
     for lang in ENVS:
         print(" ", lang, [(p["name"], p["size"]) for p in files_info[lang]])
