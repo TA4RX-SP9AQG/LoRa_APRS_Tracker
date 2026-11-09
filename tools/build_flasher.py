@@ -133,7 +133,7 @@ def main():
     }
     write_lf((firmware_dir / "version.json"), json.dumps(info, indent=2) + chr(10))
     sums = chr(10).join(
-        sha256_line for lang in ENVS for sha256_line in (p["sha256"] + "  firmware/" + lang + "/" + p["name"] for p in files_info[lang])
+        sha256_line for lang in ENVS for sha256_line in (p["sha256"] + "  " + lang + "/" + p["name"] for p in files_info[lang])
     )
     write_lf((firmware_dir / "SHA256SUMS.txt"), sums + chr(10))
 
