@@ -29,6 +29,11 @@ files = [
   'data_embed/favicon.png',
 ]
 
+import sys
+sys.path.insert(0, os.path.join('tools', 'tb_translate'))
+import web_tr
+turkish = any('TB_LANG_TR' in str(flag) for flag in env["BUILD_FLAGS"])
+
 string_to_find_str = "String"
 string_to_find_ver = "versionDate"
 
@@ -54,6 +59,10 @@ for src in files:
     build_info = f'{env_vars}<br>Build date: {current_date}'.encode()
     
     content = content.replace(b'%BUILD_INFO%', build_info)
+
+  # TrackBridge: the Turkish build (-D TB_LANG_TR) gets a Turkish web configuration page
+  if turkish and src in ('data_embed/index.html', 'data_embed/script.js'):
+    content = web_tr.translate_html(content.decode('utf-8')).encode('utf-8')
       
   with open(out, 'wb') as f:
     f.write(gzip.compress(content, compresslevel=9))

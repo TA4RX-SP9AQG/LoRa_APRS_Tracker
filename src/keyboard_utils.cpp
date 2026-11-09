@@ -17,6 +17,7 @@
  */
 
 #include <APRSPacketLib.h>
+#include "tb_lang.h"
 #include <TinyGPS++.h>
 #include <logger.h>
 #include <Wire.h>
@@ -319,7 +320,7 @@ namespace KEYBOARD_Utils {
                 profileLabel += Config.beacons[myBeaconsIndex].profileLabel;
                 profileLabel += ")";
             }
-            displayShow("   INFO", "", "  CHANGING CALLSIGN!", newCallsign, profileLabel, "", 2000);
+            displayShow("   INFO", "", TB_T("  CHANGING CALLSIGN!", "  CAGRI ISR. DEGISIYOR!"), newCallsign, profileLabel, "", 2000);
 
             STATION_Utils::saveIndex(0, myBeaconsIndex);
             sendStartTelemetry = true;
@@ -339,21 +340,21 @@ namespace KEYBOARD_Utils {
             }
         } else if (menuDisplay == 120) {
             MSG_Utils::deleteFile(0);
-            displayShow("   INFO", "", "ALL MESSAGES DELETED!", 2000);
+            displayShow("   INFO", "", TB_T("ALL MESSAGES DELETED!", "TUM MESAJLAR SILINDI!"), 2000);
             MSG_Utils::loadNumMessages();
             menuDisplay = 12;
         } else if (menuDisplay == 130 || menuDisplay == 131) {
             if (keyDetected) {
                 menuDisplay *= 10;
             } else {
-                displayShow(" APRS Thu.", "Sending:", "Happy #APRSThursday", "from LoRa Tracker 73!", "", "", 2000);
+                displayShow(TB_T(" APRS Thu.", " APRS Per."), TB_T("Sending:", "Yolluyor:"), "Happy #APRSThursday", "from LoRa Tracker 73!", "", "", 2000);
                 MSG_Utils::addToOutputBuffer(0, (menuDisplay == 130) ? "APRSPH" : "ANSRVR" , (menuDisplay == 130) ? "HOTG Happy #APRSThursday from LoRa Tracker 73!" : "CQ HOTG Happy #APRSThursday from LoRa Tracker 73!");
                 #ifdef HAS_JOYSTICK
                     menuDisplay = 13;
                 #endif
             }
         } else if (menuDisplay == 132 || menuDisplay == 133) {
-            displayShow(" APRS Thu.", "", (menuDisplay == 132) ? "   Unsubscribe" : "  Keep Subscribed", (menuDisplay == 132) ? "   from APRS Thursday" : "  for 12hours more", "", "", 2000);
+            displayShow(TB_T(" APRS Thu.", " APRS Per."), "", (menuDisplay == 132) ? TB_T("   Unsubscribe", "   Abonelik Iptal") : TB_T("  Keep Subscribed", "  Abone Kal"), (menuDisplay == 132) ? TB_T("   from APRS Thursday", "   APRS Persembe'den") : TB_T("  for 12hours more", "  12 saat daha"), "", "", 2000);
             MSG_Utils::addToOutputBuffer(0, "ANSRVR", (menuDisplay == 132) ? "U HOTG" : "K HOTG");
             #ifdef HAS_JOYSTICK
                 menuDisplay = 13;
@@ -366,7 +367,7 @@ namespace KEYBOARD_Utils {
             menuDisplay = 21;
         } else if (menuDisplay == 220) {
             displayEcoMode = !displayEcoMode;
-            displayShow(" DISPLAY", "", displayEcoMode ? "   ECO MODE -> ON" : "   ECO MODE -> OFF", 1000);
+            displayShow(TB_T(" DISPLAY", " EKRAN"), "", displayEcoMode ? TB_T("   ECO MODE -> ON", "   ECO MODU -> ON") : TB_T("   ECO MODE -> OFF", "   ECO MODU -> OFF"), 1000);
         } else if (menuDisplay == 221) {
             menuDisplay = 2210;
         } else if (menuDisplay >= 2210 && menuDisplay <= 2212) {
@@ -399,7 +400,7 @@ namespace KEYBOARD_Utils {
             #ifdef HAS_TFT
                 analogWrite(TFT_BL, screenBrightness);
             #endif
-            displayShow("  SCREEN", "", "SCREEN BRIGHTNESS " + MENU_Utils::screenBrightnessAsString(screenBrightness), 1000);
+            displayShow(TB_T("  SCREEN", "  EKRAN"), "", TB_T("SCREEN BRIGHTNESS ", "PARLAKLIK ") + MENU_Utils::screenBrightnessAsString(screenBrightness), 1000);
             STATION_Utils::saveIndex(2, screenBrightness);
             #ifdef HAS_JOYSTICK
                 menuDisplay = 221;
@@ -407,16 +408,16 @@ namespace KEYBOARD_Utils {
         }
 
         else if (menuDisplay == 240) {
-            displayShow("  STATUS", "", "WRITE STATUS","STILL IN DEVELOPMENT!", "", "", 2000); /////////////////////////
+            displayShow(TB_T("  STATUS", "  DURUM"), "", TB_T("WRITE STATUS", "DURUM YAZ"),TB_T("STILL IN DEVELOPMENT!", "GELISTIRILIYOR!"), "", "", 2000); /////////////////////////
         } else if (menuDisplay == 241) {
-            displayShow("  STATUS", "", "SELECT STATUS","STILL IN DEVELOPMENT!", "", "", 2000); /////////////////////////
+            displayShow(TB_T("  STATUS", "  DURUM"), "", TB_T("SELECT STATUS", "DURUM SEC"),TB_T("STILL IN DEVELOPMENT!", "GELISTIRILIYOR!"), "", "", 2000); /////////////////////////
         } else if (menuDisplay == 250) {
-            displayShow(" NOTIFIC", "", "NOTIFICATIONS","STILL IN DEVELOPMENT!", "", "", 2000); /////////////////////////
+            displayShow(TB_T(" NOTIFIC", " BILDIRIM"), "", TB_T("NOTIFICATIONS", "BILDIRIMLER"),TB_T("STILL IN DEVELOPMENT!", "GELISTIRILIYOR!"), "", "", 2000); /////////////////////////
         } else if (menuDisplay == 270) {
             #if defined(HAS_AXP192) || defined(HAS_AXP2101)
-                displayShow("", "", "    POWER OFF ...", 2000);
+                displayShow("", "", TB_T("    POWER OFF ...", "    KAPANIYOR ..."), 2000);
             #else
-                displayShow("", "", " starting DEEP SLEEP", 2000);
+                displayShow("", "", TB_T(" starting DEEP SLEEP", " DERIN UYKU basliyor"), 2000);
             #endif
             POWER_Utils::shutdown();
         }
@@ -466,10 +467,10 @@ namespace KEYBOARD_Utils {
         } else if (menuDisplay == 53) {
             if (winlinkCommentState) {
                 winlinkCommentState = false;
-                displayShow(" WINLINK>", "", "  WLNK COMMENTs OFF!", 2000);
+                displayShow(" WINLINK>", "", TB_T("  WLNK COMMENTs OFF!", "  WLNK YORUM OFF!"), 2000);
             } else {
                 winlinkCommentState = true;
-                displayShow(" WINLINK>", "", "  WLNK COMMENTs ON!", 2000);
+                displayShow(" WINLINK>", "", TB_T("  WLNK COMMENTs ON!", "  WLNK YORUM ON!"), 2000);
             }
         } else if (menuDisplay == 5000) {
             MSG_Utils::addToOutputBuffer(1, "WLNK-1", "L");
@@ -486,7 +487,7 @@ namespace KEYBOARD_Utils {
             menuDisplay = 50111;
         } else if (menuDisplay == 50111) {
             MSG_Utils::deleteFile(1);
-            displayShow("   INFO", "", " ALL MAILS DELETED!", 2000);
+            displayShow("   INFO", "", TB_T(" ALL MAILS DELETED!", " TUM POSTALAR SILINDI!"), 2000);
             MSG_Utils::loadNumMessages();
             if (winlinkStatus == 0) {
                 #ifdef HAS_JOYSTICK
@@ -524,32 +525,32 @@ namespace KEYBOARD_Utils {
             if (Config.email != "") MSG_Utils::addToOutputBuffer(0, "9M2PJU-4", "posmsg " + String(Config.email));
         } else if (menuDisplay == 61) {
             digipeaterActive = !digipeaterActive;
-            displayShow("  EXTRAS", "", "     Digipeater", digipeaterActive ? "   Status --> ON" : "   Status --> OFF", "", "", 2000);
+            displayShow(TB_T("  EXTRAS", "  EKSTRA"), "", "     Digipeater", digipeaterActive ? TB_T("   Status --> ON", "   Durum --> ON") : TB_T("   Status --> OFF", "   Durum --> OFF"), "", "", 2000);
             logger.log(logging::LoggerLevel::LOGGER_LEVEL_WARN, "Main", "%s", digipeaterActive ? "Digipeater ON" : "Digipeater OFF");
         } else if (menuDisplay == 62) {
             sosActive = !sosActive;
-            displayShow("  EXTRAS", "", "       S.O.S.", sosActive ? "   Status --> ON" : "   Status --> OFF", "", "", 2000);
+            displayShow(TB_T("  EXTRAS", "  EKSTRA"), "", "       S.O.S.", sosActive ? TB_T("   Status --> ON", "   Durum --> ON") : TB_T("   Status --> OFF", "   Durum --> OFF"), "", "", 2000);
             logger.log(logging::LoggerLevel::LOGGER_LEVEL_WARN, "Main", "S.O.S Mode %s", sosActive ? "ON" : "OFF");
         } else if (menuDisplay == 63) {
             menuDisplay = 630;
         } else if (menuDisplay == 64) {
             if (Config.notification.ledFlashlight) {
                 flashlight = !flashlight;
-                displayShow("  EXTRAS", "", "     Flashlight", flashlight ? "   Status --> ON" : "   Status --> OFF", "", "", 2000);
+                displayShow(TB_T("  EXTRAS", "  EKSTRA"), "", "     Flashlight", flashlight ? TB_T("   Status --> ON", "   Durum --> ON") : TB_T("   Status --> OFF", "   Durum --> OFF"), "", "", 2000);
             } else {
-                displayShow("  EXTRAS", "", "     Flashlight", "NOT ACTIVE IN CONFIG!", "", "", 2000);
+                displayShow(TB_T("  EXTRAS", "  EKSTRA"), "", "     Flashlight", TB_T("NOT ACTIVE IN CONFIG!", "AYARDA KAPALI!"), "", "", 2000);
             }
         }
 
         else if (menuDisplay == 9000) {
             #if defined(HAS_AXP192) || defined(HAS_AXP2101)
-                displayShow("", "", "    POWER OFF ...", 2000);
+                displayShow("", "", TB_T("    POWER OFF ...", "    KAPANIYOR ..."), 2000);
             #else
-                displayShow("", "", "  starting DEEP SLEEP", 2000);
+                displayShow("", "", TB_T("  starting DEEP SLEEP", "  DERIN UYKU basliyor"), 2000);
             #endif
             POWER_Utils::shutdown();
         } else if (menuDisplay == 9001) {
-            displayShow("", "", "  STARTING WiFi AP", 2000);
+            displayShow("", "", TB_T("  STARTING WiFi AP", "  WiFi AP basliyor"), 2000);
             Config.wifiAP.active = true;
             Config.writeFile();
             ESP.restart();
@@ -619,13 +620,13 @@ namespace KEYBOARD_Utils {
                 messageText = messageText.substring(0, messageText.length() - 1);
             }
         } else if (menuDisplay == 260 && key == 13) {
-            displayShow("", "", "    REBOOTING ...", 2000);
+            displayShow("", "", TB_T("    REBOOTING ...", "    RESETLENIYOR..."), 2000);
             ESP.restart();
         } else if (menuDisplay == 270 && key == 13) {
             #if defined(HAS_AXP192) || defined(HAS_AXP2101)
-                displayShow("", "", "    POWER OFF ...", 2000);
+                displayShow("", "", TB_T("    POWER OFF ...", "    KAPANIYOR ..."), 2000);
             #else
-                displayShow("", "", " starting DEEP SLEEP", 2000);
+                displayShow("", "", TB_T(" starting DEEP SLEEP", " DERIN UYKU basliyor"), 2000);
             #endif
             POWER_Utils::shutdown();
         } else if ((menuDisplay == 5021 || menuDisplay == 5031 || menuDisplay == 5041 || menuDisplay == 5051) && key >= 48 && key <= 57) {

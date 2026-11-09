@@ -9,3 +9,8 @@ installer/firmware
 installer/*.bin
 **/__pycache__/
 .claude/
+
+# TrackBridge host test build output
+tools/tb_test/*.exe
+tools/tb_test/*.pdb
+tools/tb_test/*.o

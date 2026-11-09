@@ -17,6 +17,7 @@
  */
 
 #include <APRSPacketLib.h>
+#include "tb_lang.h"
 #include <TinyGPS++.h>
 #include <SPIFFS.h>
 #include "notification_utils.h"
@@ -113,6 +114,7 @@ namespace MSG_Utils {
         File fileToReadAPRS = SPIFFS.open("/aprsMessages.txt");
         if(!fileToReadAPRS) {
             Serial.println("Failed to open APRS_Msg for reading");
+            numAPRSMessages = 0;    // TrackBridge: the file is gone (deleted from the menu), so the count must be 0 too
             return;
         }
 
@@ -158,7 +160,7 @@ namespace MSG_Utils {
                 fileToRead = SPIFFS.open("/aprsMessages.txt");
             }
             if (noAPRSMsgWarning) {
-                displayShow("   INFO", "", " NO APRS MSG SAVED", 1500);
+                displayShow("   INFO", "", TB_T(" NO APRS MSG SAVED", " KAYITLI MSJ YOK"), 1500);
             } else {
                 if(!fileToRead) {
                     Serial.println("Failed to open file for reading");
@@ -178,7 +180,7 @@ namespace MSG_Utils {
                 fileToRead = SPIFFS.open("/winlinkMails.txt");
             }
             if (noWLNKMsgWarning) {
-                displayShow("   INFO", "", " NO WLNK MAILS SAVED", 1500);
+                displayShow("   INFO", "", TB_T(" NO WLNK MAILS SAVED", " KAYITLI POSTA YOK"), 1500);
             } else {
                 if(!fileToRead) {
                     Serial.println("Failed to open file for reading");
@@ -229,6 +231,8 @@ namespace MSG_Utils {
                 return;
             }
             message.trim();
+            message.replace('\n', ' ');    // TrackBridge: one message = one line, so a received text cannot forge extra lines
+            message.replace('\r', ' ');
             if(!fileToAppendAPRS.println(station + "," + message)) {
                 Serial.println("File append failed");
             }
@@ -482,7 +486,7 @@ namespace MSG_Utils {
                             sixthLineWR += windDegrees;
                             sixthLineWR += "deg)";
 
-                            displayShow("<WEATHER>", "From --> " + lastReceivedPacket.sender, place, summary, fifthLineWR, sixthLineWR);
+                            displayShow("<WEATHER>", TB_T("From --> ", "Kimden --> ") + lastReceivedPacket.sender, place, summary, fifthLineWR, sixthLineWR);
                             menuDisplay = 300;
                             menuTime = millis();
                         } else if (lastReceivedPacket.sender == "WLNK-1") {
@@ -532,12 +536,12 @@ namespace MSG_Utils {
 
                                 #ifdef HAS_TFT
                                     #if defined(HELTEC_WIRELESS_TRACKER)
-                                        displayShow("< MSG Rx >", "From --> " + lastReceivedPacket.sender, lastReceivedPacket.payload , 3000);
+                                        displayShow("< MSG Rx >", TB_T("From --> ", "Kimden --> ") + lastReceivedPacket.sender, lastReceivedPacket.payload , 3000);
                                     #else   // T-Deck
-                                        displayShow("< MSG Rx >", "From --> " + lastReceivedPacket.sender, lastReceivedPacket.payload , 3000);
+                                        displayShow("< MSG Rx >", TB_T("From --> ", "Kimden --> ") + lastReceivedPacket.sender, lastReceivedPacket.payload , 3000);
                                     #endif
                                 #else
-                                    displayShow("< MSG Rx >", "From --> " + lastReceivedPacket.sender, lastReceivedPacket.payload , "", "", "", 3000);
+                                    displayShow("< MSG Rx >", TB_T("From --> ", "Kimden --> ") + lastReceivedPacket.sender, lastReceivedPacket.payload , "", "", "", 3000);
                                 #endif
 
                                 if (lastReceivedPacket.payload.indexOf("ack") != 0) {

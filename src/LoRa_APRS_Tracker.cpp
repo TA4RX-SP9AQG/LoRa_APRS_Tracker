@@ -38,6 +38,7 @@
 ____________________________________________________________________*/
 
 #include <BluetoothSerial.h>
+#include "tb_lang.h"
 #include <APRSPacketLib.h>
 #include <TinyGPS++.h>
 #include <Arduino.h>
@@ -199,7 +200,7 @@ void loop() {
     if (statusUpdate) {
         if (APRSPacketLib::checkNocall(currentBeacon->callsign)) {
             logger.log(logging::LoggerLevel::LOGGER_LEVEL_ERROR, "Config", "Change your callsigns in WebConfig");
-            displayShow("ERROR", "Callsigns = NOCALL!", "---> change it !!!", 2000);
+            displayShow(TB_T("ERROR", "HATA"), TB_T("Callsigns = NOCALL!", "Cagri isareti NOCALL!"), TB_T("---> change it !!!", "---> degistirin !!!"), 2000);
             KEYBOARD_Utils::rightArrow();
             currentBeacon = &Config.beacons[myBeaconsIndex];
         }
@@ -236,6 +237,7 @@ void loop() {
         if (Config.bluetooth.useBLE) {
             BLE_Utils::sendToPhone(packet.text.substring(3));
             BLE_Utils::sendToLoRa();
+            BLE_Utils::updateInfo();
         } else {
             #ifdef HAS_BT_CLASSIC
                 BLUETOOTH_Utils::sendToPhone(packet.text.substring(3));

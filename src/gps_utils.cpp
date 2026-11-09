@@ -17,6 +17,7 @@
  */
 
 #include <APRSPacketLib.h>
+#include "tb_lang.h"
 #include <TinyGPS++.h>
 #include <SPIFFS.h>
 #include "TimeLib.h"
@@ -126,7 +127,7 @@ namespace GPS_Utils {
         for (uint32_t baud : gpsBaudRates) addCandidate(baud);
 
         for (size_t i = 0; i < count; i++) {
-            if (i == 1) displayShow("GPS", "Searching", "baud rate...", 0);
+            if (i == 1) displayShow("GPS", TB_T("Searching", "Araniyor"), TB_T("baud rate...", "baud hizi..."), 0);
             bool found = probeBaudRate(candidates[i]);
             if (!found && i == 0) found = probeBaudRate(candidates[i]);    // retry first one: GPS may be slow to start
             if (found) {
@@ -227,7 +228,7 @@ namespace GPS_Utils {
             logger.log(logging::LoggerLevel::LOGGER_LEVEL_ERROR, "GPS",
                         "No GPS frames detected! Try to reset the GPS Chip with this "
                         "firmware: https://github.com/richonguzman/TTGO_T_BEAM_GPS_RESET");
-            displayShow("ERROR", "No GPS frames!", "Reset the GPS Chip", 2000);
+            displayShow(TB_T("ERROR", "HATA"), TB_T("No GPS frames!", "GPS verisi yok!"), TB_T("Reset the GPS Chip", "GPS cipini sifirla"), 2000);
         }
     }
 

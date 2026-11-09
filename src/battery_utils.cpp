@@ -17,6 +17,7 @@
  */
 
 #include <Arduino.h>
+#include "tb_lang.h"
 #include "configuration.h"
 #include "battery_utils.h"
 #include "board_pinout.h"
@@ -155,7 +156,7 @@ namespace BATTERY_Utils {
                                 measuringState = 1;
 
                                 if (batteryVoltage.toFloat() < (Config.battery.sleepVoltage - 0.1) * BATTERY_CELLS) {
-                                    displayShow("!BATTERY!", "", "LOW BATTERY VOLTAGE!",5000);
+                                    displayShow(TB_T("!BATTERY!", "!PIL!"), "", TB_T("LOW BATTERY VOLTAGE!", "PIL GERILIMI DUSUK!"),5000);
                                     POWER_Utils::shutdown();
                                 }
                             }

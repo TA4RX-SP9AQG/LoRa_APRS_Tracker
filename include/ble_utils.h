@@ -27,6 +27,7 @@ namespace BLE_Utils {
     void stop();
     void setup();
     void sendToLoRa();
+    void updateInfo();     // TrackBridge: refresh the read-only info characteristics (main loop)
     void sendToPhone(const String& packet);
 
 }

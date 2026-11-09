@@ -17,6 +17,7 @@
  */
 
 #include <logger.h>
+#include "tb_lang.h"
 #include <WiFi.h>
 #include "configuration.h"
 #include "web_utils.h"
@@ -41,7 +42,7 @@ namespace WIFI_Utils {
 
     void checkIfWiFiAP() {
         if (Config.wifiAP.active || Config.beacons[0].callsign == "NOCALL-7"){
-            displayShow(" LoRa APRS", "    ** WEB-CONF **","", "WiFiAP:LoRaTracker-AP", "IP    :   192.168.4.1","");
+            displayShow(" LoRa APRS", TB_T("    ** WEB-CONF **", "    ** WEB AYAR **"),"", "WiFiAP:LoRaTracker-AP", "IP    :   192.168.4.1","");
             logger.log(logging::LoggerLevel::LOGGER_LEVEL_WARN, "Main", "WebConfiguration Started!");
             startAutoAP();
             WEB_Utils::setup();
@@ -53,7 +54,7 @@ namespace WIFI_Utils {
                         noClientsTime = millis();
                     } else if ((millis() - noClientsTime) > 2 * 60 * 1000) {
                         logger.log(logging::LoggerLevel::LOGGER_LEVEL_WARN, "Main", "WebConfiguration Stopped!");
-                        displayShow("", "", "  STOPPING WiFi AP", 2000);
+                        displayShow("", "", TB_T("  STOPPING WiFi AP", "  WiFi AP duruyor"), 2000);
                         #ifdef RPC_MicroTracker
                             digitalWrite(15, HIGH);    // Led WiFI
                         #endif

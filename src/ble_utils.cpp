@@ -21,6 +21,7 @@
 #include "lora_utils.h"
 #include "kiss_utils.h"
 #include "ble_utils.h"
+#include "tb_ble_info.h"
 #include "display.h"
 #include "logger.h"
 
@@ -156,6 +157,7 @@ namespace BLE_Utils {
         if (pService != nullptr) {
             pCharacteristicRx->setCallbacks(new MyCallbacks());
             pService->start();
+            TB_BLE::setup(pServer);     // TrackBridge: read-only device info service
 
             BLEAdvertising* pAdvertising = BLEDevice::getAdvertising();
             pAdvertising->addServiceUUID(useKISS ? SERVICE_UUID_0 : SERVICE_UUID_1);
@@ -207,6 +209,10 @@ namespace BLE_Utils {
             for (int n = 0; n < frame.length(); n++) txBLE(frame[n]);
             txBLE('\n');
         }
+    }
+
+    void updateInfo() {
+        TB_BLE::loop();
     }
 
     void sendToPhone(const String& packet) {

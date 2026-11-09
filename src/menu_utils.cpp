@@ -17,6 +17,7 @@
  */
 
 #include <APRSPacketLib.h>
+#include "tb_lang.h"
 #include <TinyGPS++.h>
 #include <vector>
 #include "notification_utils.h"
@@ -136,9 +137,9 @@ namespace MENU_Utils {
             messageText     = "";
         }
         if (keyDetected) {
-            lastLine = "<Back Up/Down Select>";
+            lastLine = TB_T("<Back Up/Down Select>", "<Geri Yuk/Asg Sec>");
         } else {
-            lastLine = "1P=Down 2P=Back LP=Go";
+            lastLine = TB_T("1P=Down 2P=Back LP=Go", "1x=Asagi 2x=Geri Uz=Git");
         }
 
         #if defined(TTGO_T_DECK_PLUS) || defined(TTGO_T_DECK_GPS)
@@ -155,7 +156,7 @@ namespace MENU_Utils {
                 topHeader2 += " ";
             }
             if (gps.satellites.value() <= 9) topHeader2 += " ";
-            topHeader2 += "SAT:";
+            topHeader2 += TB_T("SAT:", "UYDU:");
             topHeader2 += String(gps.satellites.value());
             if (gps.hdop.hdop() > 5) {
                 topHeader2 += "X";
@@ -168,27 +169,27 @@ namespace MENU_Utils {
 
         switch (menuDisplay) { // Graphic Menu is in here!!!!
             case 1:     // 1. Messages
-                displayShow("<< MENU >>","  6.Extras", "> 1.Messages", "  2.Configuration", "  3.Reports", lastLine);
+                displayShow("<< MENU >>",TB_T("  6.Extras", "  6.Ekstralar"), TB_T("> 1.Messages", "> 1.Mesajlar"), TB_T("  2.Configuration", "  2.Ayarlar"), TB_T("  3.Reports", "  3.Raporlar"), lastLine);
                 break;
             case 2:     // 2. Configuration
-                displayShow("<< MENU >>", "  1.Messages", "> 2.Configuration", "  3.Reports", "  4.Stations", lastLine);
+                displayShow("<< MENU >>", TB_T("  1.Messages", "  1.Mesajlar"), TB_T("> 2.Configuration", "> 2.Ayarlar"), TB_T("  3.Reports", "  3.Raporlar"), TB_T("  4.Stations", "  4.Istasyonlar"), lastLine);
                 break;
             case 3:     //3. Reports
-                displayShow("<< MENU >>", "  2.Configuration", "> 3.Reports", "  4.Stations", "  5.Winlink/Mail", lastLine);
+                displayShow("<< MENU >>", TB_T("  2.Configuration", "  2.Ayarlar"), TB_T("> 3.Reports", "> 3.Raporlar"), TB_T("  4.Stations", "  4.Istasyonlar"), TB_T("  5.Winlink/Mail", "  5.Winlink/Posta"), lastLine);
                 break;
             case 4:     //4. Stations
-                displayShow("<< MENU >>", "  3.Reports", "> 4.Stations", "  5.Winlink/Mail", "  6.Extras", lastLine);
+                displayShow("<< MENU >>", TB_T("  3.Reports", "  3.Raporlar"), TB_T("> 4.Stations", "> 4.Istasyonlar"), TB_T("  5.Winlink/Mail", "  5.Winlink/Posta"), TB_T("  6.Extras", "  6.Ekstralar"), lastLine);
                 break;
             case 5:     //5. Winlink
-                displayShow("<< MENU >>", "  4.Stations", "> 5.Winlink/Mail", "  6.Extras", "  1.Messages", lastLine);
+                displayShow("<< MENU >>", TB_T("  4.Stations", "  4.Istasyonlar"), TB_T("> 5.Winlink/Mail", "> 5.Winlink/Posta"), TB_T("  6.Extras", "  6.Ekstralar"), TB_T("  1.Messages", "  1.Mesajlar"), lastLine);
                 break;
             case 6:     //6. Extras
-                displayShow("<< MENU >>", "  5.Winlink/Mail", "> 6.Extras", "  1.Messages", "  2.Configuration", lastLine);
+                displayShow("<< MENU >>", TB_T("  5.Winlink/Mail", "  5.Winlink/Posta"), TB_T("> 6.Extras", "> 6.Ekstralar"), TB_T("  1.Messages", "  1.Mesajlar"), TB_T("  2.Configuration", "  2.Ayarlar"), lastLine);
                 break;
 
 //////////
             case 10:    // 1.Messages ---> Messages Read
-                displayShow(" MESSAGES>", "> Read (" + String(MSG_Utils::getNumAPRSMessages()) + ")", "  Write", "  Delete", "  APRSThursday", lastLine);
+                displayShow(TB_T(" MESSAGES>", " MESAJLAR>"), TB_T("> Read (", "> Oku (") + String(MSG_Utils::getNumAPRSMessages()) + ")", TB_T("  Write", "  Yaz"), TB_T("  Delete", "  Sil"), "  APRSThursday", lastLine);
                 break;
             case 100:   // 1.Messages ---> Messages Read ---> Display Received/Saved APRS Messages
                 {
@@ -197,31 +198,31 @@ namespace MENU_Utils {
 
                     #ifdef HAS_TFT
                         #if defined(HELTEC_WIRELESS_TRACKER)
-                            displayShow(" MSG APRS>", "From --> " + msgSender, msgText,"                 Next=Down", "", "");
+                            displayShow(TB_T(" MSG APRS>", " APRS MSJ>"), TB_T("From --> ", "Kimden --> ") + msgSender, msgText,TB_T("                 Next=Down", "               Ileri=Asagi"), "", "");
                         #else   // T-Deck
-                            displayShow("MSG APRS>", "From --> " + msgSender, msgText,"             Next=Down", "", "");
+                            displayShow(TB_T("MSG APRS>", "APRS MSJ>"), TB_T("From --> ", "Kimden --> ") + msgSender, msgText,TB_T("             Next=Down", "           Ileri=Asagi"), "", "");
                         #endif
                     #else
-                        displayShow(" MSG APRS>", "From --> " + msgSender, msgText, "", "", "           Next=Down");
+                        displayShow(TB_T(" MSG APRS>", " APRS MSJ>"), TB_T("From --> ", "Kimden --> ") + msgSender, msgText, "", "", TB_T("           Next=Down", "         Ileri=Asagi"));
                     #endif
                 }
                 break;
             case 11:    // 1.Messages ---> Messages Write
-                displayShow(" MESSAGES>", "  Read (" + String(MSG_Utils::getNumAPRSMessages()) + ")", "> Write", "  Delete", "  APRSThursday", lastLine);
+                displayShow(TB_T(" MESSAGES>", " MESAJLAR>"), TB_T("  Read (", "  Oku (") + String(MSG_Utils::getNumAPRSMessages()) + ")", TB_T("> Write", "> Yaz"), TB_T("  Delete", "  Sil"), "  APRSThursday", lastLine);
                 break;
             case 110:   // 1.Messages ---> Messages Write ---> Write
                 if (keyDetected || keyboardConnected) {
                     #ifdef HAS_TFT
                         #if defined(HELTEC_WIRELESS_TRACKER)
-                            displayShow("WRITE MSG>", "", "CALLSIGN = " + String(messageCallsign), "", "", "<Back               Enter>");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "", TB_T("CALLSIGN = ", "CAGRI ISR. = ") + String(messageCallsign), "", "", TB_T("<Back               Enter>", "<Geri               Tamam>"));
                         #else   //  T-DECK
-                            displayShow("WRITE MSG>", "", "CALLSIGN = " + String(messageCallsign), "", "", "<Back           Enter>");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "", TB_T("CALLSIGN = ", "CAGRI ISR. = ") + String(messageCallsign), "", "", TB_T("<Back           Enter>", "<Geri           Tamam>"));
                         #endif
                     #else
-                        displayShow("WRITE MSG>", "", "CALLSIGN = " + String(messageCallsign), "", "", "<Back          Enter>");
+                        displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "", TB_T("CALLSIGN = ", "CAGRI ISR. = ") + String(messageCallsign), "", "", TB_T("<Back          Enter>", "<Geri          Tamam>"));
                     #endif
                 } else {
-                    displayShow("WRITE MSG>", "", "No Keyboard Detected", "Can't write Message", "", "1P = Back");
+                    displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "", TB_T("No Keyboard Detected", "Klavye bulunamadi"), TB_T("Can't write Message", "Mesaj yazilamaz"), "", TB_T("1P = Back", "1x = Geri"));
                 }
                 break;
             case 111:
@@ -229,157 +230,157 @@ namespace MENU_Utils {
                     #ifdef HAS_TFT
                         #if defined(HELTEC_WIRELESS_TRACKER)
                             if (messageText.length() < 10) {
-                                displayShow("WRITE MSG>", "CALLSIGN -> " + messageCallsign, "MSG -> " + messageText, "<Back      (0" + String(messageText.length()) + ")     Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("CALLSIGN -> ", "CAGRI ISR. -> ") + messageCallsign, TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back      (0", "<Geri      (0") + String(messageText.length()) + TB_T(")     Enter>", ")     Tamam>"), "", "");
                             } else {
-                                displayShow("WRITE MSG>", "CALLSIGN -> " + messageCallsign, "MSG -> " + messageText, "<Back      (" + String(messageText.length()) + ")     Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("CALLSIGN -> ", "CAGRI ISR. -> ") + messageCallsign, TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back      (", "<Geri      (") + String(messageText.length()) + TB_T(")     Enter>", ")     Tamam>"), "", "");
                             }
                         #else   // T-Deck
                             if (messageText.length() < 10) {
-                                displayShow("WRITE MSG>", "CALLSIGN -> " + messageCallsign, "MSG -> " + messageText, "<Back    (0" + String(messageText.length()) + ")   Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("CALLSIGN -> ", "CAGRI ISR. -> ") + messageCallsign, TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back    (0", "<Geri    (0") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"), "", "");
                             } else {
-                                displayShow("WRITE MSG>", "CALLSIGN -> " + messageCallsign, "MSG -> " + messageText, "<Back    (" + String(messageText.length()) + ")   Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("CALLSIGN -> ", "CAGRI ISR. -> ") + messageCallsign, TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back    (", "<Geri    (") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"), "", "");
                             }
                         #endif
                     #else
                         if (messageText.length() < 10) {
-                            displayShow("WRITE MSG>", "CALLSIGN -> " + messageCallsign, "MSG -> " + messageText, "", "", "<Back   (0" + String(messageText.length()) + ")   Enter>");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("CALLSIGN -> ", "CAGRI ISR. -> ") + messageCallsign, TB_T("MSG -> ", "MSJ -> ") + messageText, "", "", TB_T("<Back   (0", "<Geri   (0") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"));
                         } else {
-                            displayShow("WRITE MSG>", "CALLSIGN -> " + messageCallsign, "MSG -> " + messageText, "", "", "<Back   (" + String(messageText.length()) + ")   Enter>");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("CALLSIGN -> ", "CAGRI ISR. -> ") + messageCallsign, TB_T("MSG -> ", "MSJ -> ") + messageText, "", "", TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"));
                         }
                     #endif
                 } else {
                     #ifdef HAS_TFT
                         #if defined(HELTEC_WIRELESS_TRACKER)
-                            displayShow("WRITE MSG>", "  --- MSG TOO LONG! ---", " -> " + messageText, "<Back   (" + String(messageText.length()) + ")",  "", "");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("  --- MSG TOO LONG! ---", "  -- MSJ COK UZUN! --"), " -> " + messageText, TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + ")",  "", "");
                         #else   // T-Deck
-                            displayShow("WRITE MSG>", "  --- MSG TOO LONG! ---", " -> " + messageText, "<Back   (" + String(messageText.length()) + ")", "", "");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("  --- MSG TOO LONG! ---", "  -- MSJ COK UZUN! --"), " -> " + messageText, TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + ")", "", "");
                         #endif
                     #else
-                        displayShow("WRITE MSG>", "--- MSG TOO LONG! ---", " -> " + messageText, "", "", "<Back   (" + String(messageText.length()) + ")");
+                        displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("--- MSG TOO LONG! ---", "-- MSJ COK UZUN! --"), " -> " + messageText, "", "", TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + ")");
                     #endif
                 }
                 break;
             case 12:    // 1.Messages ---> Messages Delete
-                displayShow(" MESSAGES>", "  Read (" + String(MSG_Utils::getNumAPRSMessages()) + ")", "  Write", "> Delete", "  APRSThursday", lastLine);
+                displayShow(TB_T(" MESSAGES>", " MESAJLAR>"), TB_T("  Read (", "  Oku (") + String(MSG_Utils::getNumAPRSMessages()) + ")", TB_T("  Write", "  Yaz"), TB_T("> Delete", "> Sil"), "  APRSThursday", lastLine);
                 break;
             case 120:   // 1.Messages ---> Messages Delete ---> Delete: ALL
-                displayShow("DELETE MSG", "", "  DELETE APRS MSG?", "", "", " Confirm = LP or '>'");
+                displayShow(TB_T("DELETE MSG", "MESAJ SIL"), "", TB_T("  DELETE APRS MSG?", "  APRS MSJ SIL?"), "", "", TB_T(" Confirm = LP or '>'", " Onay = Uz veya '>'"));
                 break;
             case 13:    // 1.Messages ---> APRSThursday
-                displayShow(" MESSAGES>", "  Read (" + String(MSG_Utils::getNumAPRSMessages()) + ")", "  Write", "  Delete", "> APRSThursday", lastLine);
+                displayShow(TB_T(" MESSAGES>", " MESAJLAR>"), TB_T("  Read (", "  Oku (") + String(MSG_Utils::getNumAPRSMessages()) + ")", TB_T("  Write", "  Yaz"), TB_T("  Delete", "  Sil"), "> APRSThursday", lastLine);
                 break;
             case 130:   // 1.Messages ---> APRSThursday ---> Delete: ALL
-                displayShow(" APRS Thu.", "> Check In", "  Join", "  Unsubscribe", "  KeepSubscribed+12h", lastLine);
+                displayShow(TB_T(" APRS Thu.", " APRS Per."), "> Check In", TB_T("  Join", "  Katil"), TB_T("  Unsubscribe", "  Abonelik Iptal"), TB_T("  KeepSubscribed+12h", "  AboneKal+12s"), lastLine);
                 break;
             case 1300:
                 if (messageText.length() <= 67) {
                     #ifdef HAS_TFT
                         #if defined(HELTEC_WIRELESS_TRACKER)
                             if (messageText.length() < 10) {
-                                displayShow("WRITE MSG>", "    - APRSThursday -", "MSG -> " + messageText, "<Back      (0" + String(messageText.length()) + ")     Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "    - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back      (0", "<Geri      (0") + String(messageText.length()) + TB_T(")     Enter>", ")     Tamam>"), "", "");
                             } else {
-                                displayShow("WRITE MSG>", "    - APRSThursday -", "MSG -> " + messageText, "<Back      (" + String(messageText.length()) + ")     Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "    - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back      (", "<Geri      (") + String(messageText.length()) + TB_T(")     Enter>", ")     Tamam>"), "", "");
                             }
                         #else   // T-Deck
                             if (messageText.length() < 10) {
-                                displayShow("WRITE MSG>", "    - APRSThursday -", "MSG -> " + messageText, "<Back    (0" + String(messageText.length()) + ")   Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "    - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back    (0", "<Geri    (0") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"), "", "");
                             } else {
-                                displayShow("WRITE MSG>", "    - APRSThursday -", "MSG -> " + messageText, "<Back    (" + String(messageText.length()) + ")   Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "    - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back    (", "<Geri    (") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"), "", "");
                             }
                         #endif
                     #else
                         if (messageText.length() < 10) {
-                            displayShow("WRITE MSG>", "  - APRSThursday -", "MSG -> " + messageText, "", "", "<Back   (0" + String(messageText.length()) + ")   Enter>");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "  - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, "", "", TB_T("<Back   (0", "<Geri   (0") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"));
                         } else {
-                            displayShow("WRITE MSG>", "  - APRSThursday -", "MSG -> " + messageText, "", "", "<Back   (" + String(messageText.length()) + ")   Enter>");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "  - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, "", "", TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"));
                         }
                     #endif
                 } else {
                     #ifdef HAS_TFT
                         #if defined(HELTEC_WIRELESS_TRACKER)
-                            displayShow("WRITE MSG>", "  --- MSG TOO LONG! ---", " -> " + messageText, "<Back   (" + String(messageText.length()) + ")",  "", "");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("  --- MSG TOO LONG! ---", "  -- MSJ COK UZUN! --"), " -> " + messageText, TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + ")",  "", "");
                         #else   // T-Deck
-                            displayShow("WRITE MSG>", "  --- MSG TOO LONG! ---", " -> " + messageText, "<Back   (" + String(messageText.length()) + ")", "", "");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("  --- MSG TOO LONG! ---", "  -- MSJ COK UZUN! --"), " -> " + messageText, TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + ")", "", "");
                         #endif
                     #else
-                        displayShow("WRITE MSG>", "--- MSG TOO LONG! ---", " -> " + messageText, "", "", "<Back   (" + String(messageText.length()) + ")");
+                        displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("--- MSG TOO LONG! ---", "-- MSJ COK UZUN! --"), " -> " + messageText, "", "", TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + ")");
                     #endif
                 }
                 break;
             case 131:   // 1.Messages ---> APRSThursday ---> Delete: ALL
-                displayShow(" APRS Thu.", "  Check In", "> Join", "  Unsubscribe", "  KeepSubscribed+12h", lastLine);
+                displayShow(TB_T(" APRS Thu.", " APRS Per."), "  Check In", TB_T("> Join", "> Katil"), TB_T("  Unsubscribe", "  Abonelik Iptal"), TB_T("  KeepSubscribed+12h", "  AboneKal+12s"), lastLine);
                 break;
             case 1310:
                 if (messageText.length() <= 67) {
                     #ifdef HAS_TFT
                         #if defined(HELTEC_WIRELESS_TRACKER)
                             if (messageText.length() < 10) {
-                                displayShow("WRITE MSG>", "    - APRSThursday -", "MSG -> " + messageText, "<Back      (0" + String(messageText.length()) + ")     Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "    - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back      (0", "<Geri      (0") + String(messageText.length()) + TB_T(")     Enter>", ")     Tamam>"), "", "");
                             } else {
-                                displayShow("WRITE MSG>", "    - APRSThursday -", "MSG -> " + messageText, "<Back      (" + String(messageText.length()) + ")     Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "    - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back      (", "<Geri      (") + String(messageText.length()) + TB_T(")     Enter>", ")     Tamam>"), "", "");
                             }
                         #else   // T-Deck
                             if (messageText.length() < 10) {
-                                displayShow("WRITE MSG>", "    - APRSThursday -", "MSG -> " + messageText, "<Back    (0" + String(messageText.length()) + ")   Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "    - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back    (0", "<Geri    (0") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"), "", "");
                             } else {
-                                displayShow("WRITE MSG>", "    - APRSThursday -", "MSG -> " + messageText, "<Back    (" + String(messageText.length()) + ")   Enter>", "", "");
+                                displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "    - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, TB_T("<Back    (", "<Geri    (") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"), "", "");
                             }
                         #endif
                     #else
                         if (messageText.length() < 10) {
-                            displayShow("WRITE MSG>", "  - APRSThursday -", "MSG -> " + messageText, "", "", "<Back   (0" + String(messageText.length()) + ")   Enter>");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "  - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, "", "", TB_T("<Back   (0", "<Geri   (0") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"));
                         } else {
-                            displayShow("WRITE MSG>", "  - APRSThursday -", "MSG -> " + messageText, "", "", "<Back   (" + String(messageText.length()) + ")   Enter>");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), "  - APRSThursday -", TB_T("MSG -> ", "MSJ -> ") + messageText, "", "", TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + TB_T(")   Enter>", ")   Tamam>"));
                         }
                     #endif
                 } else {
                     #ifdef HAS_TFT
                         #if defined(HELTEC_WIRELESS_TRACKER)
-                            displayShow("WRITE MSG>", "  --- MSG TOO LONG! ---", " -> " + messageText, "<Back   (" + String(messageText.length()) + ")",  "", "");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("  --- MSG TOO LONG! ---", "  -- MSJ COK UZUN! --"), " -> " + messageText, TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + ")",  "", "");
                         #else   // T-Deck
-                            displayShow("WRITE MSG>", "  --- MSG TOO LONG! ---", " -> " + messageText, "<Back   (" + String(messageText.length()) + ")", "", "");
+                            displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("  --- MSG TOO LONG! ---", "  -- MSJ COK UZUN! --"), " -> " + messageText, TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + ")", "", "");
                         #endif
                     #else
-                        displayShow("WRITE MSG>", "--- MSG TOO LONG! ---", " -> " + messageText, "", "", "<Back   (" + String(messageText.length()) + ")");
+                        displayShow(TB_T("WRITE MSG>", "MESAJ YAZ>"), TB_T("--- MSG TOO LONG! ---", "-- MSJ COK UZUN! --"), " -> " + messageText, "", "", TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + ")");
                     #endif
                 }
                 break;
             case 132:   // 1.Messages ---> APRSThursday ---> Delete: ALL
-                displayShow(" APRS Thu.", "  Check In", "  Join", "> Unsubscribe", "  KeepSubscribed+12h", lastLine);
+                displayShow(TB_T(" APRS Thu.", " APRS Per."), "  Check In", TB_T("  Join", "  Katil"), TB_T("> Unsubscribe", "> Abonelik Iptal"), TB_T("  KeepSubscribed+12h", "  AboneKal+12s"), lastLine);
                 break;
             case 133:   // 1.Messages ---> APRSThursday ---> Delete: ALL
-                displayShow(" APRS Thu.", "  Check In", "  Join", "  Unsubscribe", "> KeepSubscribed+12h", lastLine);
+                displayShow(TB_T(" APRS Thu.", " APRS Per."), "  Check In", TB_T("  Join", "  Katil"), TB_T("  Unsubscribe", "  Abonelik Iptal"), TB_T("> KeepSubscribed+12h", "> AboneKal+12s"), lastLine);
                 break;
 
 //////////
             case 20:    // 2.Configuration ---> Callsign
-                displayShow(" CONFIG>", "  Power Off", "> Change Callsign ", "  Change Frequency", "  Display",lastLine);
+                displayShow(TB_T(" CONFIG>", " AYARLAR>"), TB_T("  Power Off", "  Kapat"), TB_T("> Change Callsign ", "> Cagri Degistir "), TB_T("  Change Frequency", "  Frekans Degistir"), TB_T("  Display", "  Ekran"),lastLine);
                 break;
             case 21:    // 2.Configuration ---> Change Freq
-                displayShow(" CONFIG>", "  Change Callsign ", "> Change Frequency", "  Display", "  " + checkBTType() + " (" + checkProcessActive(bluetoothActive) + ")",lastLine);
+                displayShow(TB_T(" CONFIG>", " AYARLAR>"), TB_T("  Change Callsign ", "  Cagri Degistir "), TB_T("> Change Frequency", "> Frekans Degistir"), TB_T("  Display", "  Ekran"), "  " + checkBTType() + " (" + checkProcessActive(bluetoothActive) + ")",lastLine);
                 break;
             case 22:    // 2.Configuration ---> Display
-                displayShow(" CONFIG>", "  Change Frequency", "> Display", "  " + checkBTType() + " (" + checkProcessActive(bluetoothActive) + ")", "  Status",lastLine);
+                displayShow(TB_T(" CONFIG>", " AYARLAR>"), TB_T("  Change Frequency", "  Frekans Degistir"), TB_T("> Display", "> Ekran"), "  " + checkBTType() + " (" + checkProcessActive(bluetoothActive) + ")", TB_T("  Status", "  Durum"),lastLine);
                 break;
             case 23:    // 2.Configuration ---> Bluetooth
-                displayShow(" CONFIG>", "  Display",  "> " + checkBTType() + " (" + checkProcessActive(bluetoothActive) + ")", "  Status", "  Notifications", lastLine);
+                displayShow(TB_T(" CONFIG>", " AYARLAR>"), TB_T("  Display", "  Ekran"),  "> " + checkBTType() + " (" + checkProcessActive(bluetoothActive) + ")", TB_T("  Status", "  Durum"), TB_T("  Notifications", "  Bildirimler"), lastLine);
                 break;
             case 24:    // 2.Configuration ---> Status
-                displayShow(" CONFIG>", "  " + checkBTType() + " (" + checkProcessActive(bluetoothActive) + ")", "> Status","  Notifications", "  Reboot",lastLine);
+                displayShow(TB_T(" CONFIG>", " AYARLAR>"), "  " + checkBTType() + " (" + checkProcessActive(bluetoothActive) + ")", TB_T("> Status", "> Durum"),TB_T("  Notifications", "  Bildirimler"), TB_T("  Reboot", "  Reset"),lastLine);
                 break;
             case 25:    // 2.Configuration ---> Notifications
-                displayShow(" CONFIG>", "  Status", "> Notifications", "  Reboot", "  Power Off",lastLine);
+                displayShow(TB_T(" CONFIG>", " AYARLAR>"), TB_T("  Status", "  Durum"), TB_T("> Notifications", "> Bildirimler"), TB_T("  Reboot", "  Reset"), TB_T("  Power Off", "  Kapat"),lastLine);
                 break;
             case 26:    // 2.Configuration ---> Reboot
-                displayShow(" CONFIG>", "  Notifications", "> Reboot", "  Power Off", "  Change Callsign",lastLine);
+                displayShow(TB_T(" CONFIG>", " AYARLAR>"), TB_T("  Notifications", "  Bildirimler"), TB_T("> Reboot", "> Reset"), TB_T("  Power Off", "  Kapat"), TB_T("  Change Callsign", "  Cagri Degistir"),lastLine);
                 break;
             case 27:    // 2.Configuration ---> Power Off
-                displayShow(" CONFIG>", "  Reboot", "> Power Off", "  Change Callsign", "  Change Frequency",lastLine);
+                displayShow(TB_T(" CONFIG>", " AYARLAR>"), TB_T("  Reboot", "  Reset"), TB_T("> Power Off", "> Kapat"), TB_T("  Change Callsign", "  Cagri Degistir"), TB_T("  Change Frequency", "  Frekans Degistir"),lastLine);
                 break;
 
 
             case 200:   // 2.Configuration ---> Change Callsign
-                displayShow(" CALLSIGN>", "","  Confirm Change?","","","<Back         Select>");
+                displayShow(TB_T(" CALLSIGN>", " CAGRI ISR.>"), "",TB_T("  Confirm Change?", "  Degisiklik onay?"),"","",TB_T("<Back         Select>", "<Geri         Sec>   "));
                 break;
 
             case 210:   // 2.Configuration ---> Change Frequency
@@ -389,24 +390,24 @@ namespace MENU_Utils {
                     case 2: freqChangeWarning = "      UK --> US"; break;
                     case 3: freqChangeWarning = "      US --> EU"; break;
                 }
-                displayShow("LORA FREQ>", "","   Confirm Change?", freqChangeWarning, "", "<Back         Select>");
+                displayShow(TB_T("LORA FREQ>", "LORA FREK.>"), "",TB_T("   Confirm Change?", "   Degisiklik onay?"), freqChangeWarning, "", TB_T("<Back         Select>", "<Geri         Sec>   "));
                 break;
 
             case 220:   // 2.Configuration ---> Display ---> ECO Mode
-                displayShow(" DISPLAY>", "", "> ECO Mode    (" + checkProcessActive(displayEcoMode) + ")", "  Brightness  (" + screenBrightnessAsString(screenBrightness) + ")","",lastLine);
+                displayShow(TB_T(" DISPLAY>", " EKRAN>"), "", TB_T("> ECO Mode    (", "> ECO Modu    (") + checkProcessActive(displayEcoMode) + ")", TB_T("  Brightness  (", "  Parlaklik   (") + screenBrightnessAsString(screenBrightness) + ")","",lastLine);
                 break;
 
             case 221:   // 2.Configuration ---> Display ---> Brightness
-                displayShow(" DISPLAY>", "", "  ECO Mode    (" + checkProcessActive(displayEcoMode) + ")", "> Brightness  (" + screenBrightnessAsString(screenBrightness) + ")","",lastLine);
+                displayShow(TB_T(" DISPLAY>", " EKRAN>"), "", TB_T("  ECO Mode    (", "  ECO Modu    (") + checkProcessActive(displayEcoMode) + ")", TB_T("> Brightness  (", "> Parlaklik   (") + screenBrightnessAsString(screenBrightness) + ")","",lastLine);
                 break;
             case 2210:   // 2.Configuration ---> Display ---> Brightness: MIN
-                displayShow("BRIGHTNESS", "", "> Low", "  Mid","  Max",lastLine);
+                displayShow(TB_T("BRIGHTNESS", "PARLAKLIK"), "", "> Low", "  Mid","  Max",lastLine);
                 break;
             case 2211:   // 2.Configuration ---> Display ---> Brightness: MID
-                displayShow("BRIGHTNESS", "", "  Low", "> Mid","  Max",lastLine);
+                displayShow(TB_T("BRIGHTNESS", "PARLAKLIK"), "", "  Low", "> Mid","  Max",lastLine);
                 break;
             case 2212:   // 2.Configuration ---> Display ---> Brightness: MAX
-                displayShow("BRIGHTNESS", "", "  Low", "  Mid","> Max",lastLine);
+                displayShow(TB_T("BRIGHTNESS", "PARLAKLIK"), "", "  Low", "  Mid","> Max",lastLine);
                 break;
 
             case 230:
@@ -421,39 +422,39 @@ namespace MENU_Utils {
                 break;
 
             case 240:    // 2.Configuration ---> Status
-                displayShow(" STATUS>", "", "> Write","  Select","",lastLine);
+                displayShow(TB_T(" STATUS>", " DURUM>"), "", TB_T("> Write", "> Yaz"),TB_T("  Select", "  Sec"),"",lastLine);
                 break;
             case 241:    // 2.Configuration ---> Status
-                displayShow(" STATUS>", "", "  Write","> Select","",lastLine);
+                displayShow(TB_T(" STATUS>", " DURUM>"), "", TB_T("  Write", "  Yaz"),TB_T("> Select", "> Sec"),"",lastLine);
                 break;
 
             case 250:    // 2.Configuration ---> Notifications
-                displayShow(" NOTIFIC>", "> Turn Off Sound/Led","","","",lastLine);
+                displayShow(TB_T(" NOTIFIC>", " BILDIRIM>"), TB_T("> Turn Off Sound/Led", "> Ses/Led Kapat"),"","","",lastLine);
                 break;
 
             case 260:   // 2.Configuration ---> Reboot
                 if (keyDetected) {
-                    displayShow(" REBOOT?", "","Confirm Reboot...","","","<Back   Enter=Confirm");
+                    displayShow(TB_T(" REBOOT?", " RESET?"), "",TB_T("Confirm Reboot...", "Resetleniyor..."),"","",TB_T("<Back   Enter=Confirm", "<Geri   Enter=Confirm"));
                 } else {
-                    displayShow(" REBOOT?", "no Keyboard Detected"," Use RST Button to","Reboot Tracker","",lastLine);
+                    displayShow(TB_T(" REBOOT?", " RESET?"), TB_T("no Keyboard Detected", "Klavye bulunamadi"),TB_T(" Use RST Button to", " RST dugmesiyle"),TB_T("Reboot Tracker", "resetleyin"),"",lastLine);
                 }
                 break;
             case 270:   // 2.Configuration ---> Power Off
-                displayShow("POWER OFF?", "","Confirm Power Off...","","","<Back Enter/>=Confirm");
+                displayShow(TB_T("POWER OFF?", "KAPAT?"), "",TB_T("Confirm Power Off...", "Kapaniyor..."),"","",TB_T("<Back Enter/>=Confirm", "<Geri Enter/>=Confirm"));
                 break;
 
 //////////
             case 30:     // 3. Reports : Wx Report
-                displayShow(" REPORTS >","> 1.Wx Report", "  2.Hospital QTH", "  3.Police QTH", "  4.Fire Station QTH", lastLine);
+                displayShow(TB_T(" REPORTS >", " RAPORLAR >"),TB_T("> 1.Wx Report", "> 1.Hava Raporu"), TB_T("  2.Hospital QTH", "  2.Hastane QTH"), TB_T("  3.Police QTH", "  3.Polis QTH"), TB_T("  4.Fire Station QTH", "  4.Itfaiye QTH"), lastLine);
                 break;
             case 31:     // 3. Reports : Nearest Hospital
-                displayShow(" REPORTS >","  1.Wx Report", "> 2.Hospital QTH", "  3.Police QTH", "  4.Fire Station QTH", lastLine);
+                displayShow(TB_T(" REPORTS >", " RAPORLAR >"),TB_T("  1.Wx Report", "  1.Hava Raporu"), TB_T("> 2.Hospital QTH", "> 2.Hastane QTH"), TB_T("  3.Police QTH", "  3.Polis QTH"), TB_T("  4.Fire Station QTH", "  4.Itfaiye QTH"), lastLine);
                 break;
             case 32:     // 3. Reports : Nearest Police Station
-                displayShow(" REPORTS >","  1.Wx Report", "  2.Hospital QTH", "> 3.Police QTH", "  4.Fire Station QTH", lastLine);
+                displayShow(TB_T(" REPORTS >", " RAPORLAR >"),TB_T("  1.Wx Report", "  1.Hava Raporu"), TB_T("  2.Hospital QTH", "  2.Hastane QTH"), TB_T("> 3.Police QTH", "> 3.Polis QTH"), TB_T("  4.Fire Station QTH", "  4.Itfaiye QTH"), lastLine);
                 break;
             case 33:     // 3. Reports : Nearest Fire Station
-                displayShow(" REPORTS >","  1.Wx Report", "  2.Hospital QTH", "  3.Police QTH", "> 4.Fire Station QTH", lastLine);
+                displayShow(TB_T(" REPORTS >", " RAPORLAR >"),TB_T("  1.Wx Report", "  1.Hava Raporu"), TB_T("  2.Hospital QTH", "  2.Hastane QTH"), TB_T("  3.Police QTH", "  3.Polis QTH"), TB_T("> 4.Fire Station QTH", "> 4.Itfaiye QTH"), lastLine);
                 break;
 
             case 300:
@@ -462,10 +463,10 @@ namespace MENU_Utils {
 
 //////////
             case 40:    //4.Stations ---> Packet Decoder
-                displayShow(" STATIONS>", "", "> Packet Decoder", "  Near By Stations", "", "<Back");
+                displayShow(TB_T(" STATIONS>", " ISTASYON>"), "", TB_T("> Packet Decoder", "> Paket Cozucu"), TB_T("  Near By Stations", "  Yakin Istasyonlar"), "", TB_T("<Back", "<Geri"));
                 break;
             case 41:    //4.Stations ---> Near By Stations
-                displayShow(" STATIONS>", "", "  Packet Decoder", "> Near By Stations", "", "<Back");
+                displayShow(TB_T(" STATIONS>", " ISTASYON>"), "", TB_T("  Packet Decoder", "  Paket Cozucu"), TB_T("> Near By Stations", "> Yakin Istasyonlar"), "", TB_T("<Back", "<Geri"));
                 break;
 
             case 400:   //4.Stations ---> Packet Decoder
@@ -482,23 +483,23 @@ namespace MENU_Utils {
                         double distanceKm = TinyGPSPlus::distanceBetween(gps.location.lat(), gps.location.lng(), lastReceivedPacket.latitude, lastReceivedPacket.longitude) / 1000.0;
                         double courseTo   = TinyGPSPlus::courseTo(gps.location.lat(), gps.location.lng(), lastReceivedPacket.latitude, lastReceivedPacket.longitude);
 
-                        String pathDec = (lastReceivedPacket.path.length() > 14) ? "P:" : "PATH:  ";
+                        String pathDec = (lastReceivedPacket.path.length() > 14) ? "P:" : TB_T("PATH:  ", "YOL:  ");
                         pathDec += lastReceivedPacket.path;
 
                         displayShow(firstLineDecoder, "GPS " + String(lastReceivedPacket.latitude,3) + " " + String(lastReceivedPacket.longitude,3), courseSpeedAltitude, "D:" + String(distanceKm) + "km    " + String(courseTo,0), pathDec, "< RSSI:" + String(lastReceivedPacket.rssi) + " SNR:" + String(lastReceivedPacket.snr));
                     } else if (lastReceivedPacket.type == 1) {    // message
-                        displayShow(firstLineDecoder, "ADDRESSEE: " + lastReceivedPacket.addressee, "MSG:  " + lastReceivedPacket.payload, "", "", "< RSSI:" + String(lastReceivedPacket.rssi) + " SNR:" + String(lastReceivedPacket.snr));
+                        displayShow(firstLineDecoder, TB_T("ADDRESSEE: ", "ALICI: ") + lastReceivedPacket.addressee, TB_T("MSG:  ", "MSJ:  ") + lastReceivedPacket.payload, "", "", "< RSSI:" + String(lastReceivedPacket.rssi) + " SNR:" + String(lastReceivedPacket.snr));
                     } else if (lastReceivedPacket.type == 2) {    // status
-                        displayShow(firstLineDecoder, "-------STATUS-------", lastReceivedPacket.payload, "", "", "< RSSI:" + String(lastReceivedPacket.rssi) + " SNR:" + String(lastReceivedPacket.snr));
+                        displayShow(firstLineDecoder, TB_T("-------STATUS-------", "-------DURUM--------"), lastReceivedPacket.payload, "", "", "< RSSI:" + String(lastReceivedPacket.rssi) + " SNR:" + String(lastReceivedPacket.snr));
                     } else if (lastReceivedPacket.type == 3) {    // telemetry
-                        displayShow(firstLineDecoder, "------TELEMETRY------", "", "", "", "< RSSI:" + String(lastReceivedPacket.rssi) + " SNR:" + String(lastReceivedPacket.snr));
+                        displayShow(firstLineDecoder, TB_T("------TELEMETRY------", "-----TELEMETRI------"), "", "", "", "< RSSI:" + String(lastReceivedPacket.rssi) + " SNR:" + String(lastReceivedPacket.snr));
                     } else if (lastReceivedPacket.type == 5) {    // object
-                        displayShow(firstLineDecoder, "-------OBJECT-------", "", "", "", "< RSSI:" + String(lastReceivedPacket.rssi) + " SNR:" + String(lastReceivedPacket.snr));
+                        displayShow(firstLineDecoder, TB_T("-------OBJECT-------", "-------NESNE--------"), "", "", "", "< RSSI:" + String(lastReceivedPacket.rssi) + " SNR:" + String(lastReceivedPacket.snr));
                     }
                 }
                 break;
             case 410:    //4.Stations ---> Near By Stations
-                displayShow(" NEAR BY>", STATION_Utils::getNearStation(0), STATION_Utils::getNearStation(1), STATION_Utils::getNearStation(2), STATION_Utils::getNearStation(3), "<Back");
+                displayShow(TB_T(" NEAR BY>", " YAKIN>"), STATION_Utils::getNearStation(0), STATION_Utils::getNearStation(1), STATION_Utils::getNearStation(2), STATION_Utils::getNearStation(3), TB_T("<Back", "<Geri"));
                 break;
 
 //////////
@@ -506,38 +507,38 @@ namespace MENU_Utils {
                 if (winlinkStatus == 5) {
                     menuDisplay = 5000;
                 } else {
-                    displayShow(" WINLINK>", "> Login" , "  Read SavedMails(" + String(MSG_Utils::getNumWLNKMails()) + ")", "  Delete SavedMails", "  Wnlk Comment (" + checkProcessActive(winlinkCommentState) + ")" , lastLine);
+                    displayShow(" WINLINK>", TB_T("> Login", "> Giris") , TB_T("  Read SavedMails(", "  Kayitli Posta Oku(") + String(MSG_Utils::getNumWLNKMails()) + ")", TB_T("  Delete SavedMails", "  Kayitli Posta Sil"), TB_T("  Wnlk Comment (", "  Wnlk Yorum (") + checkProcessActive(winlinkCommentState) + ")" , lastLine);
                 }
                 break;
             case 51:    // 5.Winlink
-                displayShow(" WINLINK>", "  Login" , "> Read SavedMails(" + String(MSG_Utils::getNumWLNKMails()) + ")", "  Delete SavedMails", "  Wnlk Comment (" + checkProcessActive(winlinkCommentState) + ")" , lastLine);
+                displayShow(" WINLINK>", TB_T("  Login", "  Giris") , TB_T("> Read SavedMails(", "> Kayitli Posta Oku(") + String(MSG_Utils::getNumWLNKMails()) + ")", TB_T("  Delete SavedMails", "  Kayitli Posta Sil"), TB_T("  Wnlk Comment (", "  Wnlk Yorum (") + checkProcessActive(winlinkCommentState) + ")" , lastLine);
                 break;
             case 52:    // 5.Winlink
-                displayShow(" WINLINK>", "  Login" , "  Read SavedMails(" + String(MSG_Utils::getNumWLNKMails()) + ")", "> Delete SavedMails", "  Wnlk Comment (" + checkProcessActive(winlinkCommentState) + ")" , lastLine);
+                displayShow(" WINLINK>", TB_T("  Login", "  Giris") , TB_T("  Read SavedMails(", "  Kayitli Posta Oku(") + String(MSG_Utils::getNumWLNKMails()) + ")", TB_T("> Delete SavedMails", "> Kayitli Posta Sil"), TB_T("  Wnlk Comment (", "  Wnlk Yorum (") + checkProcessActive(winlinkCommentState) + ")" , lastLine);
                 break;
             case 53:    // 5.Winlink
-                displayShow(" WINLINK>", "  Login" , "  Read SavedMails(" + String(MSG_Utils::getNumWLNKMails()) + ")", "  Delete SavedMails", "> Wnlk Comment (" + checkProcessActive(winlinkCommentState) + ")" , lastLine);
+                displayShow(" WINLINK>", TB_T("  Login", "  Giris") , TB_T("  Read SavedMails(", "  Kayitli Posta Oku(") + String(MSG_Utils::getNumWLNKMails()) + ")", TB_T("  Delete SavedMails", "  Kayitli Posta Sil"), TB_T("> Wnlk Comment (", "> Wnlk Yorum (") + checkProcessActive(winlinkCommentState) + ")" , lastLine);
                 break;
 
             case 500:    // 5.Winlink ---> Login
-                displayShow(" WINLINK>", "" , "Login Initiation ...", "Challenge -> waiting", "" , "");
+                displayShow(" WINLINK>", "" , TB_T("Login Initiation ...", "Giris basliyor ..."), TB_T("Challenge -> waiting", "Challenge -> bekliyor"), "" , "");
                 break;
             case 501:    // 5.Winlink ---> Login
-                displayShow(" WINLINK>", "" , "Login Initiation ...", "Challenge -> sent", "" , "");
+                displayShow(" WINLINK>", "" , TB_T("Login Initiation ...", "Giris basliyor ..."), TB_T("Challenge -> sent", "Challenge -> gitti"), "" , "");
                 break;
             case 502:    // 5.Winlink ---> Login
-                displayShow(" WINLINK>", "" , "Login Initiation ...", "Challenge -> ack ...", "" , "");
+                displayShow(" WINLINK>", "" , TB_T("Login Initiation ...", "Giris basliyor ..."), TB_T("Challenge -> ack ...", "Challenge -> onay ..."), "" , "");
                 break;
 
             case 5000:   // WINLINK: List Pend. Mail //
-                displayShow("WLNK MENU>", "  Write Mail" , "> List Pend. Mails", "  Downloaded Mails", "  Read Mail    (R#)", lastLine);
+                displayShow("WLNK MENU>", TB_T("  Write Mail", "  Posta Yaz") , TB_T("> List Pend. Mails", "> Bekleyen Postalar"), TB_T("  Downloaded Mails", "  Inen Postalar"), TB_T("  Read Mail    (R#)", "  Posta Oku   (R#)"), lastLine);
                 break;
 
             case 5010:    // WINLINK: Downloaded Mails //
-                displayShow("WLNK MENU>", "  List Pend. Mails", "> Downloaded Mails", "  Read Mail    (R#)", "  Reply Mail   (Y#)", lastLine);
+                displayShow("WLNK MENU>", TB_T("  List Pend. Mails", "  Bekleyen Postalar"), TB_T("> Downloaded Mails", "> Inen Postalar"), TB_T("  Read Mail    (R#)", "  Posta Oku   (R#)"), TB_T("  Reply Mail   (Y#)", "  Posta Yanit (Y#)"), lastLine);
                 break;
             case 50100:    // WINLINK: Downloaded Mails //
-                displayShow(" WINLINK>", "" , "> Read SavedMails(" + String(MSG_Utils::getNumWLNKMails()) + ")", "  Delete SavedMails", "" , lastLine);
+                displayShow(" WINLINK>", "" , TB_T("> Read SavedMails(", "> Kayitli Posta Oku(") + String(MSG_Utils::getNumWLNKMails()) + ")", TB_T("  Delete SavedMails", "  Kayitli Posta Sil"), "" , lastLine);
                 break;
             case 50101:    // WINLINK: Downloaded Mails //
                 {
@@ -545,133 +546,133 @@ namespace MENU_Utils {
 
                     #ifdef HAS_TFT
                         #if defined(HELTEC_WIRELESS_TRACKER)
-                            displayShow("WLNK MAIL>", mailText, "                 Next=Down", "", "", "");
+                            displayShow("WLNK MAIL>", mailText, TB_T("                 Next=Down", "               Ileri=Asagi"), "", "", "");
                         #else   // T-Deck
-                            displayShow("WLNK MAIL>", mailText, "             Next=Down", "", "", "");
+                            displayShow("WLNK MAIL>", mailText, TB_T("             Next=Down", "           Ileri=Asagi"), "", "", "");
                         #endif
                     #else
-                        displayShow("WLNK MAIL>", "", mailText, "", "", "           Next=Down");
+                        displayShow("WLNK MAIL>", "", mailText, "", "", TB_T("           Next=Down", "         Ileri=Asagi"));
                     #endif
 
                 }
                 break;
             case 50110:    // WINLINK: Downloaded Mails //
-                displayShow(" WINLINK>", "" , "  Read SavedMails(" + String(MSG_Utils::getNumWLNKMails()) + ")", "> Delete SavedMails", "" , lastLine);
+                displayShow(" WINLINK>", "" , TB_T("  Read SavedMails(", "  Kayitli Posta Oku(") + String(MSG_Utils::getNumWLNKMails()) + ")", TB_T("> Delete SavedMails", "> Kayitli Posta Sil"), "" , lastLine);
                 break;
             case 50111:    // WINLINK: Downloaded Mails //
-                displayShow("WLNK DEL>", "", "  DELETE ALL MAILS?", "", "", " Confirm = LP or '>'");
+                displayShow("WLNK DEL>", "", TB_T("  DELETE ALL MAILS?", "  TUM POSTA SIL?"), "", "", TB_T(" Confirm = LP or '>'", " Onay = Uz veya '>'"));
                 break;
 
             case 5020:    // WINLINK: Read Mail //
-                displayShow("WLNK MENU>", "  Downloaded Mails", "> Read Mail    (R#)", "  Reply Mail   (Y#)", "  Forward Mail (F#)", lastLine);
+                displayShow("WLNK MENU>", TB_T("  Downloaded Mails", "  Inen Postalar"), TB_T("> Read Mail    (R#)", "> Posta Oku   (R#)"), TB_T("  Reply Mail   (Y#)", "  Posta Yanit (Y#)"), TB_T("  Forward Mail (F#)", "  Posta Ilet  (F#)"), lastLine);
                 break;
             case 5021:
-                displayShow("WLNK READ>", "", "    READ MAIL N." + winlinkMailNumber, "", "", "<Back          Enter>");
+                displayShow("WLNK READ>", "", TB_T("    READ MAIL N.", "    POSTA OKU N.") + winlinkMailNumber, "", "", TB_T("<Back          Enter>", "<Geri          Tamam>"));
                 break;
 
             case 5030:    // WINLINK: Reply Mail //
-                displayShow("WLNK MENU>", "  Read Mail    (R#)", "> Reply Mail   (Y#)", "  Forward Mail (F#)", "  Delete Mail  (K#)", lastLine);
+                displayShow("WLNK MENU>", TB_T("  Read Mail    (R#)", "  Posta Oku   (R#)"), TB_T("> Reply Mail   (Y#)", "> Posta Yanit (Y#)"), TB_T("  Forward Mail (F#)", "  Posta Ilet  (F#)"), TB_T("  Delete Mail  (K#)", "  Posta Sil   (K#)"), lastLine);
                 break;
             case 5031:
-                displayShow("WLNK REPLY", "", "   REPLY MAIL N." + winlinkMailNumber , "", "", "<Back          Enter>");
+                displayShow("WLNK REPLY", "", TB_T("   REPLY MAIL N.", "   POSTA YANIT N.") + winlinkMailNumber , "", "", TB_T("<Back          Enter>", "<Geri          Tamam>"));
                 break;
 
             case 5040:    // WINLINK: Foward Mail //
-                displayShow("WLNK MENU>", "  Reply Mail   (Y#)", "> Forward Mail (F#)", "  Delete Mail  (K#)", "  Alias Menu", lastLine);
+                displayShow("WLNK MENU>", TB_T("  Reply Mail   (Y#)", "  Posta Yanit (Y#)"), TB_T("> Forward Mail (F#)", "> Posta Ilet  (F#)"), TB_T("  Delete Mail  (K#)", "  Posta Sil   (K#)"), "  Alias Menu", lastLine);
                 break;
             case 5041:    // WINLINK: Forward Mail //
-                displayShow("WLNK FORW>", "", "  FORWARD MAIL N." + winlinkMailNumber , "", "", "<Back          Enter>");
+                displayShow("WLNK FORW>", "", TB_T("  FORWARD MAIL N.", "  POSTA ILET N.") + winlinkMailNumber , "", "", TB_T("<Back          Enter>", "<Geri          Tamam>"));
                 break;
             case 5042:    // WINLINK: Forward Mail //
-                displayShow("WLNK FORW>", "  FORWARD MAIL N." + winlinkMailNumber , "To = " + winlinkAddressee, "", "", "<Back          Enter>");
+                displayShow("WLNK FORW>", TB_T("  FORWARD MAIL N.", "  POSTA ILET N.") + winlinkMailNumber , "To = " + winlinkAddressee, "", "", TB_T("<Back          Enter>", "<Geri          Tamam>"));
                 break;
 
             case 5050:    // WINLINK: Delete Mail //
-                displayShow("WLNK MENU>", "  Forward Mail (F#)", "> Delete Mail  (K#)", "  Alias Menu", "  Log Out", lastLine);
+                displayShow("WLNK MENU>", TB_T("  Forward Mail (F#)", "  Posta Ilet  (F#)"), TB_T("> Delete Mail  (K#)", "> Posta Sil   (K#)"), "  Alias Menu", TB_T("  Log Out", "  Cikis"), lastLine);
                 break;
             case 5051:    // WINLINK: Delete Mail //
-                displayShow("WLNK DEL>", "", "   DELETE MAIL N."  + winlinkMailNumber, "", "", "<Back          Enter>");
+                displayShow("WLNK DEL>", "", TB_T("   DELETE MAIL N.", "   POSTA SIL N.")  + winlinkMailNumber, "", "", TB_T("<Back          Enter>", "<Geri          Tamam>"));
                 break;
 
             case 5060:    // WINLINK: Alias Menu //
-                displayShow("WLNK MENU>", "  Delete Mail  (K#)", "> Alias Menu", "  Log Out", "  Write Mail", lastLine);
+                displayShow("WLNK MENU>", TB_T("  Delete Mail  (K#)", "  Posta Sil   (K#)"), "> Alias Menu", TB_T("  Log Out", "  Cikis"), TB_T("  Write Mail", "  Posta Yaz"), lastLine);
                 break;
             case 5061:    // WINLINK: Alias Menu : Create Alias //
-                displayShow("WLNK ALIAS", "> Create Alias" , "  Delete Alias ", "  List All Alias", "", lastLine);
+                displayShow("WLNK ALIAS", TB_T("> Create Alias", "> Alias Olustur") , TB_T("  Delete Alias ", "  Alias Sil "), TB_T("  List All Alias", "  Tum Alias"), "", lastLine);
                 break;
             case 50610:   // WINLINK: Alias Menu : Create Alias //
-                displayShow("WLNK ALIAS", "", "Write Alias to Create", "     -> " + winlinkAlias, "", "<Back          Enter>");
+                displayShow("WLNK ALIAS", "", TB_T("Write Alias to Create", "Olusturulacak Alias"), "     -> " + winlinkAlias, "", TB_T("<Back          Enter>", "<Geri          Tamam>"));
                 break;
             case 50611:   // WINLINK: Alias Menu : Create Alias //
-                displayShow("WLNK ALIAS", "", "      " + winlinkAlias + " =", winlinkAliasComplete, "", "<Back          Enter>");
+                displayShow("WLNK ALIAS", "", "      " + winlinkAlias + " =", winlinkAliasComplete, "", TB_T("<Back          Enter>", "<Geri          Tamam>"));
                 break;
             case 5062:    // WINLINK: Alias Menu : Delete Alias //
-                displayShow("WLNK ALIAS", "  Create Alias" , "> Delete Alias ", "  List All Alias", "", lastLine);
+                displayShow("WLNK ALIAS", TB_T("  Create Alias", "  Alias Olustur") , TB_T("> Delete Alias ", "> Alias Sil "), TB_T("  List All Alias", "  Tum Alias"), "", lastLine);
                 break;
             case 50620:   // WINLINK: Alias Menu : Delete Alias //
-                displayShow("WLNK ALIAS", "Write Alias to Delete", "", "     -> " + winlinkAlias, "", "<Back          Enter>");
+                displayShow("WLNK ALIAS", TB_T("Write Alias to Delete", "Silinecek Alias"), "", "     -> " + winlinkAlias, "", TB_T("<Back          Enter>", "<Geri          Tamam>"));
                 break;
             case 5063:    // WINLINK: Alias Menu : List Alias//
-                displayShow("WLNK ALIAS", "  Create Alias" , "  Delete Alias ", "> List All Alias", "", lastLine);
+                displayShow("WLNK ALIAS", TB_T("  Create Alias", "  Alias Olustur") , TB_T("  Delete Alias ", "  Alias Sil "), TB_T("> List All Alias", "> Tum Alias"), "", lastLine);
                 break;
 
             case 5070:    // WINLINK: Log Out MAIL //
-                displayShow("WLNK MENU>", "  Alias Menu", "> Log Out", "  Write Mail", "  List Pend. Mails", lastLine);
+                displayShow("WLNK MENU>", "  Alias Menu", TB_T("> Log Out", "> Cikis"), TB_T("  Write Mail", "  Posta Yaz"), TB_T("  List Pend. Mails", "  Bekleyen Postalar"), lastLine);
                 break;
 
             case 5080:    // WINLINK: WRITE MAIL //
-                displayShow("WLNK MENU>", "  Log Out", "> Write Mail", "  List Pend. Mails", "  Downloaded Mails", lastLine);
+                displayShow("WLNK MENU>", TB_T("  Log Out", "  Cikis"), TB_T("> Write Mail", "> Posta Yaz"), TB_T("  List Pend. Mails", "  Bekleyen Postalar"), TB_T("  Downloaded Mails", "  Inen Postalar"), lastLine);
                 break;
             case 5081:    // WINLINK: WRITE MAIL: Addressee //
                 #ifdef HAS_TFT
                     #if defined(HELTEC_WIRELESS_TRACKER)
-                        displayShow("WLNK MAIL>", "   --- Send Mail to ---", "-> " + winlinkAddressee, "<Back               Enter>", "", "");
+                        displayShow("WLNK MAIL>", TB_T("   --- Send Mail to ---", "   -- Posta alicisi --"), "-> " + winlinkAddressee, TB_T("<Back               Enter>", "<Geri               Tamam>"), "", "");
                     #else   // T-Deck?
-                        displayShow("WLNK MAIL>", "   --- Send Mail to ---", "-> " + winlinkAddressee, "<Back           Enter>", "", "");
+                        displayShow("WLNK MAIL>", TB_T("   --- Send Mail to ---", "   -- Posta alicisi --"), "-> " + winlinkAddressee, TB_T("<Back           Enter>", "<Geri           Tamam>"), "", "");
                     #endif
                 #else
-                    displayShow("WLNK MAIL>", "--- Send Mail to ---", "-> " + winlinkAddressee, "", "", "<Back          Enter>");
+                    displayShow("WLNK MAIL>", TB_T("--- Send Mail to ---", "-- Posta alicisi --"), "-> " + winlinkAddressee, "", "", TB_T("<Back          Enter>", "<Geri          Tamam>"));
                 #endif
                 break;
             case 5082:    // WINLINK: WRITE MAIL: Subject //
                 #ifdef HAS_TFT
                     #if defined(HELTEC_WIRELESS_TRACKER)
-                        displayShow("WLNK MAIL>", "   --- Write Subject ---", "-> " + winlinkSubject, "<Back               Enter>", "", "");
+                        displayShow("WLNK MAIL>", TB_T("   --- Write Subject ---", "   -- Konu yaz --"), "-> " + winlinkSubject, TB_T("<Back               Enter>", "<Geri               Tamam>"), "", "");
                     #else   // T-Deck?
-                        displayShow("WLNK MAIL>", "   --- Write Subject ---", "-> " + winlinkSubject, "<Back           Enter>", "", "");
+                        displayShow("WLNK MAIL>", TB_T("   --- Write Subject ---", "   -- Konu yaz --"), "-> " + winlinkSubject, TB_T("<Back           Enter>", "<Geri           Tamam>"), "", "");
                     #endif
                 #else
-                    displayShow("WLNK MAIL>", "--- Write Subject ---", "-> " + winlinkSubject, "", "", "<Back          Enter>");
+                    displayShow("WLNK MAIL>", TB_T("--- Write Subject ---", "-- Konu yaz --"), "-> " + winlinkSubject, "", "", TB_T("<Back          Enter>", "<Geri          Tamam>"));
                 #endif
                 break;
             case 5083:    // WINLINK: WRITE MAIL: Body //
                 if (winlinkBody.length() <= 67) {
                     #ifdef HAS_TFT
                         #if defined(HELTEC_WIRELESS_TRACKER)
-                            displayShow("WLNK MAIL>", "-- Body (Lenght =" + String(winlinkBody.length()) + ")", "-> " + winlinkBody, "<Clear Body         Enter>", "", "");
+                            displayShow("WLNK MAIL>", TB_T("-- Body (Lenght =", "-- Govde (Uzun. =") + String(winlinkBody.length()) + ")", "-> " + winlinkBody, TB_T("<Clear Body         Enter>", "<Govde Sil          Tamam>"), "", "");
                         #else   // T-Deck
-                            displayShow("WLNK MAIL>", "-- Body (Lenght =" + String(winlinkBody.length()) + ")", "-> " + winlinkBody, "<Clear Body     Enter>", "", "");
+                            displayShow("WLNK MAIL>", TB_T("-- Body (Lenght =", "-- Govde (Uzun. =") + String(winlinkBody.length()) + ")", "-> " + winlinkBody, TB_T("<Clear Body     Enter>", "<Govde Sil      Tamam>"), "", "");
                         #endif
                     #else
-                        displayShow("WLNK MAIL>", "-- Body (Lenght =" + String(winlinkBody.length()) + ")", "-> " + winlinkBody, "", "", "<Clear Body    Enter>");
+                        displayShow("WLNK MAIL>", TB_T("-- Body (Lenght =", "-- Govde (Uzun. =") + String(winlinkBody.length()) + ")", "-> " + winlinkBody, "", "", TB_T("<Clear Body    Enter>", "<Govde Sil     Tamam>"));
                     #endif
                 } else {
                     #ifdef HAS_TFT
                         #if defined(HELTEC_WIRELESS_TRACKER)
-                            displayShow("WLNK MAIL>", "-- Body Too Long = " + String(winlinkBody.length()), "-> " + winlinkBody, "<Clear Body", "", "");
+                            displayShow("WLNK MAIL>", TB_T("-- Body Too Long = ", "-- Govde Cok Uzun = ") + String(winlinkBody.length()), "-> " + winlinkBody, TB_T("<Clear Body", "<Govde Sil "), "", "");
                         #else   // T-Deck
-                            displayShow("WLNK MAIL>", "-- Body Too Long = " + String(winlinkBody.length()), "-> " + winlinkBody, "<Clear Body", "", "");
+                            displayShow("WLNK MAIL>", TB_T("-- Body Too Long = ", "-- Govde Cok Uzun = ") + String(winlinkBody.length()), "-> " + winlinkBody, TB_T("<Clear Body", "<Govde Sil "), "", "");
                         #endif
                     #else
-                        displayShow("WLNK MAIL>", "-- Body Too Long = " + String(winlinkBody.length()), "-> " + winlinkBody, "", "", "<Clear Body");
+                        displayShow("WLNK MAIL>", TB_T("-- Body Too Long = ", "-- Govde Cok Uzun = ") + String(winlinkBody.length()), "-> " + winlinkBody, "", "", TB_T("<Clear Body", "<Govde Sil "));
                     #endif
                 }
                 break;
             case 5084:    // WINLINK: WRITE MAIL: End Mail? //
-                displayShow("WLNK MAIL>", "", "> End Mail", "  1 More Line", "", "      Up/Down Select>");
+                displayShow("WLNK MAIL>", "", TB_T("> End Mail", "> Bitir"), TB_T("  1 More Line", "  1 Satir Daha"), "", "      Up/Down Select>");
                 break;
             case 5085:    // WINLINK: WRITE MAIL: One More Line(Body) //
-                displayShow("WLNK MAIL>", "", "  End Mail", "> 1 More Line", "", "      Up/Down Select>");
+                displayShow("WLNK MAIL>", "", TB_T("  End Mail", "  Bitir"), TB_T("> 1 More Line", "> 1 Satir Daha"), "", "      Up/Down Select>");
                 break;
 
                 // validar winlinkStatus = 0
@@ -679,40 +680,40 @@ namespace MENU_Utils {
 
 //////////
             case 60:    // 6. Extras ---> Send Email with GPS info
-                displayShow(" EXTRAS>", "  Flashlight    (" + checkProcessActive(flashlight) + ")", "> Send Email(GPS)", "  Digipeater    (" + checkProcessActive(digipeaterActive) + ")", "  S.O.S.        (" + checkProcessActive(sosActive) + ")", lastLine);
+                displayShow(TB_T(" EXTRAS>", " EKSTRA>"), TB_T("  Flashlight    (", "  Fener         (") + checkProcessActive(flashlight) + ")", TB_T("> Send Email(GPS)", "> E-posta (GPS)"), "  Digipeater    (" + checkProcessActive(digipeaterActive) + ")", "  S.O.S.        (" + checkProcessActive(sosActive) + ")", lastLine);
                 break;
             case 61:    // 6. Extras ---> Digipeater
-                displayShow(" EXTRAS>", "  Send Email(GPS)", "> Digipeater    (" + checkProcessActive(digipeaterActive) + ")", "  S.O.S.        (" + checkProcessActive(sosActive) + ")", "  Beacon(GPS)+Comment", lastLine);
+                displayShow(TB_T(" EXTRAS>", " EKSTRA>"), TB_T("  Send Email(GPS)", "  E-posta (GPS)"), "> Digipeater    (" + checkProcessActive(digipeaterActive) + ")", "  S.O.S.        (" + checkProcessActive(sosActive) + ")", TB_T("  Beacon(GPS)+Comment", "  Beacon(GPS)+Yorum"), lastLine);
                 break;
             case 62:    // 6. Extras ---> S.O.S.
-                displayShow(" EXTRAS>", "  Digipeater    (" + checkProcessActive(digipeaterActive) + ")", "> S.O.S.        (" + checkProcessActive(sosActive) + ")", "  Beacon(GPS)+Comment", "  Flashlight    (" + checkProcessActive(flashlight) + ")", lastLine);
+                displayShow(TB_T(" EXTRAS>", " EKSTRA>"), "  Digipeater    (" + checkProcessActive(digipeaterActive) + ")", "> S.O.S.        (" + checkProcessActive(sosActive) + ")", TB_T("  Beacon(GPS)+Comment", "  Beacon(GPS)+Yorum"), TB_T("  Flashlight    (", "  Fener         (") + checkProcessActive(flashlight) + ")", lastLine);
                 break;
             case 63:    // 6. Extras ---> Beacon(GPS) + Comment
-                displayShow(" EXTRAS>", "  S.O.S.        (" + checkProcessActive(sosActive) + ")", "> Beacon(GPS)+Comment", "  Flashlight    (" + checkProcessActive(flashlight) + ")", "  Send Email(GPS)", lastLine);
+                displayShow(TB_T(" EXTRAS>", " EKSTRA>"), "  S.O.S.        (" + checkProcessActive(sosActive) + ")", TB_T("> Beacon(GPS)+Comment", "> Beacon(GPS)+Yorum"), TB_T("  Flashlight    (", "  Fener         (") + checkProcessActive(flashlight) + ")", TB_T("  Send Email(GPS)", "  E-posta (GPS)"), lastLine);
                 break;
             case 64:    // 6. Extras ---> Flashlight
-                displayShow(" EXTRAS>", "  Beacon(GPS)+Comment", "> Flashlight    (" + checkProcessActive(flashlight) + ")", "  Send Email(GPS)", "  Digipeater    (" + checkProcessActive(digipeaterActive) + ")", lastLine);
+                displayShow(TB_T(" EXTRAS>", " EKSTRA>"), TB_T("  Beacon(GPS)+Comment", "  Beacon(GPS)+Yorum"), TB_T("> Flashlight    (", "> Fener         (") + checkProcessActive(flashlight) + ")", TB_T("  Send Email(GPS)", "  E-posta (GPS)"), "  Digipeater    (" + checkProcessActive(digipeaterActive) + ")", lastLine);
                 break;
 
             case 630:
                 if (keyDetected) {
                     if (messageText.length() <= 67) {
                         String lengthStr = (messageText.length() < 10) ? "0" + String(messageText.length()) : String(messageText.length());
-                        displayShow(" COMMENT>", "Send this Comment in", "the next GPS Beacon :", messageText, "", "<Back   (" + lengthStr + ")   Enter>");
+                        displayShow(TB_T(" COMMENT>", " YORUM>"), TB_T("Send this Comment in", "Bu yorum sonraki"), TB_T("the next GPS Beacon :", "GPS beacon'da gider:"), messageText, "", TB_T("<Back   (", "<Geri   (") + lengthStr + TB_T(")   Enter>", ")   Tamam>"));
                     } else {
-                        displayShow(" COMMENT>", "Comment is too long! ", "Comment too long:" + messageText, "", "", "<Back   (" + String(messageText.length()) + ")>");
+                        displayShow(TB_T(" COMMENT>", " YORUM>"), TB_T("Comment is too long! ", "Yorum cok uzun! "), TB_T("Comment too long:", "Yorum cok uzun:") + messageText, "", "", TB_T("<Back   (", "<Geri   (") + String(messageText.length()) + ")>");
                     }
                 } else {
-                    displayShow(" COMMENT>", "No Keyboard Detected", "", "", "", lastLine);
+                    displayShow(TB_T(" COMMENT>", " YORUM>"), TB_T("No Keyboard Detected", "Klavye bulunamadi"), "", "", "", lastLine);
                 }
                 break;
 
 //////////
             case 9000:  //  9. multiPress Menu ---> Turn ON WiFi AP
-                displayShow(" CONFIG>", "> Turn Tracker Off","  Config. WiFi AP",  "","",lastLine);
+                displayShow(TB_T(" CONFIG>", " AYARLAR>"), TB_T("> Turn Tracker Off", "> Tracker Kapat"),TB_T("  Config. WiFi AP", "  WiFi AP Ayari"),  "","",lastLine);
                 break;
             case 9001:  //  9. multiPress Menu
-                displayShow(" CONFIG>", "  Turn Tracker Off","> Config. WiFi AP",  "","",lastLine);
+                displayShow(TB_T(" CONFIG>", " AYARLAR>"), TB_T("  Turn Tracker Off", "  Tracker Kapat"),TB_T("> Config. WiFi AP", "> WiFi AP Ayari"),  "","",lastLine);
                 break;
 
 
@@ -737,7 +738,7 @@ namespace MENU_Utils {
                     secondRowMainMenu = Utils::createDateString(time_now) + "   " + Utils::createTimeString(time_now);
                     if (time_now % 10 < 5) {
                         if (gps.satellites.value() == 0) {
-                            thirdRowMainMenu = "WAITING FOR GPS:";
+                            thirdRowMainMenu = TB_T("WAITING FOR GPS:", "GPS BEKLENIYOR:");
                         } else {
                             thirdRowMainMenu = String(gps.location.lat(), 4);
                             thirdRowMainMenu += " ";
@@ -803,31 +804,31 @@ namespace MENU_Utils {
                         fourthRowMainMenu = WX_Utils::readDataSensor(1);
                     }
                     if (MSG_Utils::getNumWLNKMails() > 0) {
-                        fourthRowMainMenu = "** WLNK MAIL: ";
+                        fourthRowMainMenu = TB_T("** WLNK MAIL: ", "** WLNK POSTA: ");
                         fourthRowMainMenu += String(MSG_Utils::getNumWLNKMails());
                         fourthRowMainMenu += " **";
                     }
                     if (MSG_Utils::getNumAPRSMessages() > 0) {
-                        fourthRowMainMenu = "*** MESSAGES: ";
+                        fourthRowMainMenu = TB_T("*** MESSAGES: ", "*** MESAJLAR: ");
                         fourthRowMainMenu += String(MSG_Utils::getNumAPRSMessages());
                         fourthRowMainMenu += " ***";
                     }
                     if (!gpsIsActive) {
-                        fourthRowMainMenu = "*** GPS  SLEEPING ***";
+                        fourthRowMainMenu = TB_T("*** GPS  SLEEPING ***", "*** GPS UYKUDA ***");
                     }
                 }
 
                 if (showHumanHeading) {
                     fifthRowMainMenu = GPS_Utils::getCardinalDirection(gps.course.deg());
                 } else {
-                    fifthRowMainMenu = "LAST Rx = ";
+                    fifthRowMainMenu = TB_T("LAST Rx = ", "SON Rx = ");
                     fifthRowMainMenu += MSG_Utils::getLastHeardTracker();
                 }
 
                 if (batteryConnected) {
                     String batteryVoltage = BATTERY_Utils::getBatteryInfoVoltage();
                     #if defined(TTGO_T_Beam_V0_7) || defined(TTGO_LORA32_V2_1_GPS) || defined(TTGO_LORA32_V2_1_915_GPS) || defined(TTGO_LORA32_V2_1_TNC) || defined(TTGO_LORA32_V2_1_915_TNC) || defined(HELTEC_V2_GPS) || defined(HELTEC_V2_GPS_915) || defined(HELTEC_V2_TNC) || defined(HELTEC_V3_GPS) || defined(HELTEC_V3_TNC) || defined(HELTEC_V3_2_GPS) || defined(HELTEC_V3_2_TNC) || defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_WSL_V3_GPS_DISPLAY) || defined(HELTEC_WSL_V3_TNC) || defined(TTGO_T_DECK_GPS) || defined(TTGO_T_DECK_PLUS) || defined(LIGHTTRACKER_PLUS_1_0) || defined(TTGO_LORA32_T3S3_V1_2_GPS) || defined(TTGO_T_BEAM_1W) || defined(Hydra_1W_LoRa_E22_400M30S_GPS)
-                        sixthRowMainMenu = "Battery: ";
+                        sixthRowMainMenu = TB_T("Battery: ", "Pil: ");
                         sixthRowMainMenu += batteryVoltage;
                         sixthRowMainMenu += "V   ";
                         sixthRowMainMenu += BATTERY_Utils::getPercentVoltageBattery(batteryVoltage.toFloat());
@@ -837,15 +838,15 @@ namespace MENU_Utils {
                         String batteryCharge = POWER_Utils::getBatteryInfoCurrent();
                         #ifdef HAS_AXP192
                             if (batteryCharge.toInt() == 0) {
-                                sixthRowMainMenu = "Battery Charged ";
+                                sixthRowMainMenu = TB_T("Battery Charged ", "Pil Dolu ");
                                 sixthRowMainMenu += batteryVoltage;
                                 sixthRowMainMenu += "V";
                             } else if (batteryCharge.toInt() > 0) {
-                                sixthRowMainMenu = "Bat: ";
+                                sixthRowMainMenu = TB_T("Bat: ", "Pil: ");
                                 sixthRowMainMenu += batteryVoltage;
-                                sixthRowMainMenu += "V (charging)";
+                                sixthRowMainMenu += TB_T("V (charging)", "V (sarj)");
                             } else {
-                                sixthRowMainMenu = "Battery ";
+                                sixthRowMainMenu = TB_T("Battery ", "Pil ");
                                 sixthRowMainMenu += batteryVoltage;
                                 sixthRowMainMenu += "V ";
                                 sixthRowMainMenu += batteryCharge;
@@ -864,15 +865,15 @@ namespace MENU_Utils {
                                 lowBatteryPercent = 21;
                             }
                             if (POWER_Utils::isCharging() && batteryCharge != "100") {
-                                sixthRowMainMenu = "Bat: ";
+                                sixthRowMainMenu = TB_T("Bat: ", "Pil: ");
                                 sixthRowMainMenu += String(batteryVoltage);
-                                sixthRowMainMenu += "V (charging)";
+                                sixthRowMainMenu += TB_T("V (charging)", "V (sarj)");
                             } else if (!POWER_Utils::isCharging() && batteryCharge == "100") {
-                                sixthRowMainMenu = "Battery Charged ";
+                                sixthRowMainMenu = TB_T("Battery Charged ", "Pil Dolu ");
                                 sixthRowMainMenu += String(batteryVoltage);
                                 sixthRowMainMenu += "V";
                             } else {
-                                sixthRowMainMenu = "Battery  ";
+                                sixthRowMainMenu = TB_T("Battery  ", "Pil  ");
                                 sixthRowMainMenu += String(batteryVoltage);
                                 sixthRowMainMenu += "V   ";
                                 sixthRowMainMenu += batteryCharge;
@@ -881,7 +882,7 @@ namespace MENU_Utils {
                         #endif
                     #endif
                 } else {
-                    sixthRowMainMenu = "No Battery Connected";
+                    sixthRowMainMenu = TB_T("No Battery Connected", "Pil bagli degil");
                 }
                 displayShow(firstRowMainMenu,
                             secondRowMainMenu,
