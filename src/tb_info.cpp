@@ -21,6 +21,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 namespace TB {
 namespace {
@@ -305,6 +306,10 @@ size_t tryConfig(const ConfigData& c, const Detail& detail, char* out, size_t ca
         w.key("eco"); w.boolean(b.gpsEco);
         if (detail.commentChars > 0) { w.key("cm"); w.str(b.comment, detail.commentChars); }
         if (detail.labelChars > 0) { w.key("lbl"); w.str(b.label, detail.labelChars); }
+        // "cc" / "lc": the comment / label is longer than what is shown here (cut or left out), so the app must not
+        // present the shown text as the whole value
+        if (b.comment && strlen(b.comment) > detail.commentChars) { w.key("cc"); w.boolean(true); }
+        if (b.label && strlen(b.label) > detail.labelChars) { w.key("lc"); w.boolean(true); }
         w.endObject();
     }
     w.endArray();
@@ -365,6 +370,22 @@ size_t buildConfig(const ConfigData& c, char* out, size_t cap) {
     }
     if (cap > 0) out[0] = '\0';
     return 0;
+}
+
+size_t buildCommandResult(const CommandResult& r, char* out, size_t cap) {
+    Writer w(out, cap);
+    w.beginObject();
+    w.key("v");  w.integer(kProtocolVersion);
+    w.key("id"); w.integer(r.id);
+    w.key("ok"); w.boolean(r.ok);
+    if (r.op) { w.key("op"); w.str(r.op, 12); }
+    if (!r.ok && r.err) { w.key("err"); w.str(r.err, 24); }
+    if (r.field && r.field[0]) { w.key("field"); w.str(r.field, 24); }
+    if (r.left >= 0) { w.key("left"); w.integer(r.left); }
+    if (r.waitS > 0) { w.key("wait"); w.integer(r.waitS); }
+    if (r.restart) { w.key("restart"); w.boolean(true); }
+    w.endObject();
+    return finish(w);
 }
 
 size_t buildMessages(const MessageData* newest, size_t count, int total, char* out, size_t cap) {

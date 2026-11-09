@@ -116,7 +116,7 @@ def main():
         manifest = {
             "name": "TrackBridge firmware (" + ("English" if lang == "en" else "Türkçe") + ")",
             "version": version,
-            "new_install_prompt_erase": False,
+            "new_install_prompt_erase": True,
             "builds": [
                 {
                     "chipFamily": "ESP32-S3",

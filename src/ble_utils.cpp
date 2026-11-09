@@ -22,6 +22,7 @@
 #include "kiss_utils.h"
 #include "ble_utils.h"
 #include "tb_ble_info.h"
+#include "tb_ble_control.h"
 #include "display.h"
 #include "logger.h"
 
@@ -56,6 +57,7 @@ String  kissSerialBuffer        = "";
 class MyServerCallbacks : public NimBLEServerCallbacks {
     void onConnect(NimBLEServer* pServer) {
         bluetoothConnected = true;
+        TB_BLE_CONTROL::connectionChanged();
         logger.log(logging::LoggerLevel::LOGGER_LEVEL_INFO, "BLE", "%s", "BLE Client Connected");
         #ifdef RPC_MicroTracker
             digitalWrite(13, LOW);    // Led BT/BLE
@@ -65,6 +67,7 @@ class MyServerCallbacks : public NimBLEServerCallbacks {
 
     void onDisconnect(NimBLEServer* pServer) {
         bluetoothConnected = false;
+        TB_BLE_CONTROL::connectionChanged();
         logger.log(logging::LoggerLevel::LOGGER_LEVEL_INFO, "BLE", "%s", "BLE client Disconnected, Started Advertising");
         #ifdef RPC_MicroTracker
             digitalWrite(13, HIGH);    // Led BT/BLE

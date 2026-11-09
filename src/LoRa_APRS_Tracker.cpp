@@ -39,6 +39,7 @@ ____________________________________________________________________*/
 
 #include <BluetoothSerial.h>
 #include "tb_lang.h"
+#include "tb_ble_control.h"
 #include <APRSPacketLib.h>
 #include <TinyGPS++.h>
 #include <Arduino.h>
@@ -197,8 +198,9 @@ void setup() {
 }
 
 void loop() {
+    TB_BLE_CONTROL::loop();     // TrackBridge: settings changes from the app, PIN and session timers
     currentBeacon = &Config.beacons[myBeaconsIndex];
-    if (statusUpdate) {
+    if (statusUpdate && !TB_BLE_CONTROL::pinActive()) {    // the NOCALL warning below would wipe the pairing PIN
         if (APRSPacketLib::checkNocall(currentBeacon->callsign)) {
             logger.log(logging::LoggerLevel::LOGGER_LEVEL_ERROR, "Config", "Change your callsigns in WebConfig");
             displayShow(TB_T("ERROR", "HATA"), TB_T("Callsigns = NOCALL!", "Cagri isareti NOCALL!"), TB_T("---> change it !!!", "---> degistirin !!!"), 2000);

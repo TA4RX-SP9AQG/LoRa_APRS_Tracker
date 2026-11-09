@@ -327,7 +327,11 @@ void Configuration::setDefaultValues() {
     display.turn180                 = false;
     display.showSymbol              = true;
 
-    bluetooth.active                = false;
+    #ifdef HAS_BT_CLASSIC
+        bluetooth.active            = false;
+    #else
+        bluetooth.active            = true;    // TrackBridge: BLE on from the start, so the app can do the first set-up
+    #endif
     bluetooth.deviceName            = "LoRaTracker";
     #ifdef HAS_BT_CLASSIC
         bluetooth.useBLE            = false;

@@ -30,10 +30,10 @@ def compiler():
     sys.exit("no host C++ compiler found (install ziglang: uv tool install ziglang)")
 
 
-def build():
-    out = HERE / "tb_test.exe"
-    cmd = compiler() + ["-std=c++11", "-I" + str(ROOT / "include"), "-Wall", "-Wextra", "-O1", "-fsanitize=undefined", str(HERE / "test_tb_info.cpp"),
-                        str(ROOT / "src" / "tb_info.cpp"), "-o", str(out)]
+def build(test_source, sources, out_name, extra_includes=()):
+    out = HERE / out_name
+    cmd = compiler() + ["-std=c++11", "-I" + str(ROOT / "include")] + ["-I" + str(i) for i in extra_includes] + [
+        "-Wall", "-Wextra", "-O1", "-fsanitize=undefined", str(HERE / test_source)] + [str(ROOT / "src" / x) for x in sources] + ["-o", str(out)]
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError:
@@ -43,8 +43,16 @@ def build():
 
 
 def main():
-    exe = build()
-    raw = subprocess.run([str(exe)], capture_output=True, check=True).stdout
+    json_lib = ROOT / ".pio" / "libdeps" / "heltec_wireless_tracker" / "ArduinoJson" / "src"
+    if not json_lib.exists():
+        sys.exit("ArduinoJson not found; run `pio run -e heltec_wireless_tracker` once to download the libraries")
+    info = build("test_tb_info.cpp", ["tb_info.cpp"], "tb_test.exe")
+    control = build("test_tb_control.cpp", ["tb_control.cpp", "tb_info.cpp"], "tb_control_test.exe", [json_lib])
+    raw = subprocess.run([str(info)], capture_output=True, check=True).stdout
+    control_run = subprocess.run([str(control)], capture_output=True)
+    raw += control_run.stdout
+    if control_run.returncode not in (0, 1) or b"SUMMARY" not in control_run.stdout:
+        sys.exit("control test crashed (exit code %s): %s" % (control_run.returncode, control_run.stderr.decode("utf-8", "replace")[-400:]))
     cases = 0
     failures = []
     names = {}
@@ -52,6 +60,12 @@ def main():
         if not line:
             continue
         parts = line.split(b"\t", 4)
+        if parts[0] == b"FAIL":
+            failures.append("control test: " + line.decode("utf-8", "replace")[5:])
+            continue
+        if parts[0] == b"SUMMARY":
+            print("control:", line.decode("utf-8", "replace").split(chr(9), 1)[1])
+            continue
         if parts[0] == b"OVERRUN":
             failures.append("buffer overrun: " + line.decode("utf-8", "replace"))
             continue
@@ -98,6 +112,9 @@ def main():
     expect(len(names.get("config_normal", {}).get("b", [])) == 3, "config_normal: expected 3 beacons")
     expect(len(names.get("config_overflow_degrades", {}).get("b", [])) >= 1, "config_overflow: must keep at least 1 beacon")
     expect(names.get("config_empty", {}).get("b") == [], "config_empty: expected empty beacon list")
+    first = (names.get("config_overflow_degrades", {}).get("b") or [{}])[0]
+    expect(first.get("cc") == 1, "config_overflow: a cut comment must be flagged with cc")
+    expect(all("cc" not in x for x in names.get("config_normal", {}).get("b", [])), "config_normal: short comments must not be flagged")
     msgs = names.get("messages_normal", {})
     expect(msgs.get("n") == 6 and 1 <= len(msgs.get("m", [])) <= 6, "messages_normal: wrong counts")
     expect(msgs.get("m", [{}])[0].get("f") == "SP9AAA-7", "messages_normal: newest must be first")
@@ -108,7 +125,7 @@ def main():
     expect([m["f"] for m in skipped.get("m", [])] == ["OK"], "messages_big_skipped: oversized message must be skipped")
 
     # The glue must never touch private settings.
-    for glue in ("src/tb_ble_info.cpp", "include/tb_ble_info.h", "src/tb_info.cpp", "include/tb_info.h"):
+    for glue in ("src/tb_ble_info.cpp", "include/tb_ble_info.h", "src/tb_info.cpp", "include/tb_info.h", "src/tb_control.cpp", "include/tb_control.h", "src/tb_ble_control.cpp", "include/tb_ble_control.h"):
         p = ROOT / glue
         if p.exists():
             code = re.sub(r"//.*|/\*.*?\*/", "", p.read_text(encoding="utf-8"), flags=re.S)

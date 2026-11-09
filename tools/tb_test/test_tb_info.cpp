@@ -69,7 +69,7 @@ static std::vector<TB::BeaconData> sampleBeacons(size_t n, const char* comment) 
         b.symbol = "[";
         b.overlay = "/";
         b.comment = comment;
-        b.label = "walk";
+        b.label = "";
         b.smartBeacon = true;
         b.smartSetting = (int)i;
         v.push_back(b);

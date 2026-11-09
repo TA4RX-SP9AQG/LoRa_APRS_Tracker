@@ -27,10 +27,12 @@
 #include "battery_utils.h"
 #include "board_pinout.h"
 #include "tb_ble_info.h"
+#include "tb_ble_control.h"
 #include "tb_info.h"
 #include "msg_utils.h"
 
-// Same UUID family as the KISS service, own range. All characteristics are READ only.
+// Same UUID family as the KISS service, own range. Info, settings and messages are READ only; changing settings
+// goes through the control characteristic in tb_ble_control.cpp.
 #define TB_SERVICE_UUID   "00000010-ba2a-46c9-ae49-01b0961f68bb"
 #define TB_INFO_UUID      "00000011-ba2a-46c9-ae49-01b0961f68bb"
 #define TB_CONFIG_UUID    "00000012-ba2a-46c9-ae49-01b0961f68bb"
@@ -233,6 +235,7 @@ namespace TB_BLE {
         infoChr     = service->createCharacteristic(TB_INFO_UUID, NIMBLE_PROPERTY::READ);
         configChr   = service->createCharacteristic(TB_CONFIG_UUID, NIMBLE_PROPERTY::READ);
         messagesChr = service->createCharacteristic(TB_MESSAGES_UUID, NIMBLE_PROPERTY::READ);
+        TB_BLE_CONTROL::setup(service);    // change settings from the app (needs the PIN shown on the tracker)
         service->start();
         // Reserve the full size once, so later updates never reallocate while a phone is reading.
         static const uint8_t zeros[TB::kMaxPayload] = {0};

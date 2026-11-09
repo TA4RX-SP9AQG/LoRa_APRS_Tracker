@@ -113,6 +113,22 @@ struct MessageData {
     const char* text;
 };
 
+// Answer to a command from the app (see tb_control.h). [err] is a short code such as "bad_pin"; [field] names the
+// offending key of a rejected change; [left] is the number of PIN tries left (-1 = not applicable); [waitS] is how long
+// to wait before trying again (0 = not applicable).
+struct CommandResult {
+    long        id;
+    bool        ok;
+    const char* op;
+    const char* err;
+    const char* field;
+    int         left;
+    int         waitS;
+    bool        restart;
+};
+
+size_t buildCommandResult(const CommandResult& result, char* out, size_t cap);
+
 // Each function writes a NUL-terminated JSON object into [out] (capacity [cap] bytes) and returns its
 // length, or 0 when even the smallest form does not fit. They never write outside [out].
 size_t buildInfo(const InfoData& data, char* out, size_t cap);

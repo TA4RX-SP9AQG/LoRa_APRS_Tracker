@@ -18,6 +18,7 @@
 
 #include <APRSPacketLib.h>
 #include "tb_lang.h"
+#include "tb_ble_control.h"
 #include <TinyGPS++.h>
 #include <vector>
 #include "notification_utils.h"
@@ -129,6 +130,7 @@ namespace MENU_Utils {
     }
 
     void showOnScreen() {
+        if (TB_BLE_CONTROL::drawPinScreen()) return;    // TrackBridge: pairing code for changing settings from the app
         String lastLine;
         uint32_t lastMenuTime = millis() - menuTime;
         if (!(menuDisplay==0) && !(menuDisplay==400) && !(menuDisplay==410) && !(menuDisplay==300) && !(menuDisplay>=500 && menuDisplay<=5100) && lastMenuTime > 30*1000) {

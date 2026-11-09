@@ -1,7 +1,7 @@
 {
   "name": "TrackBridge firmware (Türkçe)",
   "version": "4.0.1-tb1",
-  "new_install_prompt_erase": false,
+  "new_install_prompt_erase": true,
   "builds": [
     {
       "chipFamily": "ESP32-S3",

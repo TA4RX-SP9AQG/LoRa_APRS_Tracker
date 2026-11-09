@@ -64,6 +64,7 @@
       <li data-i="s_click"></li>
       <li data-i="s_boot"></li>
       <li data-i="s_wait"></li>
+      <li data-i="s_erase"></li>
     </ol>
     <label><input type="checkbox" id="ack"> <span data-i="ack"></span></label>
     <div id="install" hidden style="margin-top:.8rem">
@@ -117,13 +118,14 @@
         s_click: 'Tick the box below, press “Install firmware” and pick the tracker’s USB port in the list.',
         s_boot: 'If no port appears or it cannot connect: hold the BOOT (PRG) button, plug the USB cable in (or tap RST), release, and try again.',
         s_wait: 'Wait until it says the installation is complete. Do not unplug the tracker meanwhile. It restarts by itself.',
+        s_erase: 'Leave “Erase device” unticked: your settings are kept. Tick it only if the tracker does not start properly after an installation; it then deletes everything (settings and messages) and starts with default settings.',
         ack: 'I have a valid amateur radio licence, this is a Heltec Wireless Tracker, and I understand that this replaces the tracker’s firmware.',
         btn: 'Install firmware',
         unsupported: 'This browser cannot flash devices. Use Chrome or Edge on a computer.',
         notallowed: 'Flashing needs a secure page (https).',
         h_after: '3. Afterwards',
         a_app: 'In the TrackBridge app: Connection tab → connect → “Tracker device”. Battery, GPS, settings and stored messages appear there. If the app still says the firmware is not recognised, press “I just installed it, check again”.',
-        a_config: 'Your settings (callsign, beacons, frequency) are kept. If the tracker starts as NOCALL, enter them again on its web configuration page.',
+        a_config: 'Your settings (callsign, beacons, frequency) are kept. A new or erased tracker starts as NOCALL: set it up in the app (Connection tab → Tracker device → Set up now; type the code shown on the tracker’s screen), or on its web configuration page.',
         a_recover: 'If something goes wrong the tracker cannot be bricked by this: hold BOOT while plugging in the USB cable and install again.',
         h_files: 'What is written',
         files_help: 'These four files are written to the tracker’s flash. The settings and messages area is not touched. Checksums (SHA-256):',
@@ -149,13 +151,14 @@
         s_click: 'Aşağıdaki kutuyu işaretleyin, “Firmware yükle”ye basın ve listeden tracker’ın USB portunu seçin.',
         s_boot: 'Port görünmezse ya da bağlanamazsa: BOOT (PRG) düğmesini basılı tutarak USB kabloyu takın (veya RST’ye dokunun), bırakın ve tekrar deneyin.',
         s_wait: 'Yükleme tamamlandı yazana kadar bekleyin, bu sırada tracker’ı çıkarmayın. Kendiliğinden yeniden başlar.',
+        s_erase: '“Cihazı sil” kutusunu işaretlemeyin: ayarlarınız korunur. Yalnızca yüklemeden sonra tracker düzgün açılmıyorsa işaretleyin; her şeyi (ayarlar ve mesajlar) siler ve varsayılan ayarlarla başlar.',
         ack: 'Geçerli bir amatör telsiz lisansım var, bu bir Heltec Wireless Tracker ve tracker’ın firmware’inin değişeceğini anlıyorum.',
         btn: 'Firmware yükle',
         unsupported: 'Bu tarayıcı cihaz yazamaz. Bilgisayarda Chrome veya Edge kullanın.',
         notallowed: 'Yükleme için güvenli sayfa (https) gerekir.',
         h_after: '3. Sonrasında',
         a_app: 'TrackBridge uygulamasında: Bağlantı sekmesi → bağlan → “Tracker cihazı”. Pil, GPS, ayarlar ve cihazdaki mesajlar orada görünür. Uygulama hâlâ firmware’i tanımıyorsa “Yazılımı yeni yükledim, yeniden kontrol et”e basın.',
-        a_config: 'Ayarlarınız (çağrı işareti, beacon’lar, frekans) korunur. Tracker NOCALL olarak açılırsa web ayar sayfasından tekrar girin.',
+        a_config: 'Ayarlarınız (çağrı işareti, beacon’lar, frekans) korunur. Yeni ya da silinmiş bir tracker NOCALL olarak açılır: uygulamadan ayarlayın (Bağlantı sekmesi → Tracker cihazı → Şimdi ayarla; tracker’ın ekranındaki kodu yazın) ya da web ayar sayfasından girin.',
         a_recover: 'Bir şey ters giderse bu işlemle tracker bozulmaz (brick olmaz): USB’yi BOOT basılıyken takıp yeniden yükleyin.',
         h_files: 'Neler yazılır',
         files_help: 'Bu dört dosya tracker’ın flash belleğine yazılır. Ayarların ve mesajların tutulduğu bölüme dokunulmaz. Sağlama toplamları (SHA-256):',
