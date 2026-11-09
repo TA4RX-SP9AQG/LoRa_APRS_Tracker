@@ -127,6 +127,7 @@ extern bool gpsIsActive;
 
 void setup() {
     Serial.begin(115200);
+    Config.recoverFileSystem();     // TrackBridge: format a missing/invalid file system now that FreeRTOS is running
 
     #ifndef DEBUG
         logger.setDebugLevel(logging::LoggerLevel::LOGGER_LEVEL_INFO);

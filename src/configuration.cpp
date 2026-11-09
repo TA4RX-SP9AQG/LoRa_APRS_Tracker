@@ -414,14 +414,27 @@ void Configuration::setDefaultValues() {
     Serial.println("New Data Created... All is Written!");
 }
 
+void Configuration::recoverFileSystem() {
+    if (!spiffsNeedsFormat) return;
+    spiffsNeedsFormat = false;
+    Serial.println("SPIFFS not valid, formatting now...");
+    if (SPIFFS.begin(true)) {    // formats because the mount fails; safe here, the system is running
+        writeFile();             // the defaults set by the constructor
+        Serial.println("SPIFFS formatted, default settings written");
+    } else {
+        Serial.println("SPIFFS Format Failed, running on default settings without saving");
+    }
+}
+
 Configuration::Configuration() {
     if (!SPIFFS.begin(false)) {
-        Serial.println("SPIFFS Mount Failed, formatting...");
-
-        if (!SPIFFS.begin(true)) {
-            Serial.println("SPIFFS Format Failed");
-            return;
-        }
+        // TrackBridge: this constructor runs before FreeRTOS has started, and formatting from here crashes the chip
+        // (assert in xTaskGetIdleTaskHandleForCPU, reboot loop with a black screen). Start with the default
+        // settings and let setup() format the file system once the system is up (see recoverFileSystem()).
+        Serial.println("SPIFFS Mount Failed, will format after start...");
+        setDefaultValues();
+        spiffsNeedsFormat = true;
+        return;
     }
     Serial.println("SPIFFS Ready");
 

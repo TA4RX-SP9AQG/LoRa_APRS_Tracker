@@ -148,6 +148,11 @@ public:
     bool writeFile();
     Configuration();
 
+    // TrackBridge: set when the file system could not be mounted at start (first install, new flash layout).
+    // setup() then calls recoverFileSystem(), which formats it and writes the default settings.
+    bool    spiffsNeedsFormat = false;
+    void    recoverFileSystem();
+
 private:
     bool readFile();
 };
