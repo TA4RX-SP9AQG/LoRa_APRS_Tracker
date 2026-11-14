@@ -108,8 +108,10 @@ generic BLE KISS clients do not support passkey pairing from this firmware's poi
   that is also true for a fresh tracker. Switch on "Secure link" once the tracker works (see above).
 * The PIN travels unencrypted over the air once; it is single use, so it cannot be replayed, but someone injecting packets into an
   open session with special equipment is not stopped.
-* The settings file is not written atomically; a power cut during the save can lose it (the tracker then starts with the default
-  settings). The flasher's "Erase device" option and the automatic first-start repair recover from a broken file system.
+* The settings file is saved through a temporary file (`/tracker_conf.tmp`) that replaces it only after it reads back as valid
+  JSON, and a save cut off by a power loss is cleaned up or restored at the next start. This is tested only by reading the code
+  and building, not by cutting power on a real tracker. The flasher's "Erase device" option and the automatic first-start repair
+  recover from a broken file system.
 * A radio setting the chip refuses stops the tracker at start-up. The ranges are limited to what the board's chip accepts, but
   nothing is tested on a real tracker yet.
 

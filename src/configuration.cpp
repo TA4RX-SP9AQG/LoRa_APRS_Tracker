@@ -25,12 +25,71 @@
 
 extern logging::Logger logger;
 
+namespace {
+
+    // TrackBridge: the settings are written to a temporary file first and only replace the real file once the new content
+    // reads back as valid JSON, so a power cut or a full file system during a save can no longer leave a half-written file.
+    constexpr const char* kConfigFile = "/tracker_conf.json";
+    constexpr const char* kConfigTemp = "/tracker_conf.tmp";
+
+    bool validJsonFile(const char* path) {
+        File f = SPIFFS.open(path, "r");
+        if (!f) return false;
+        const bool bigEnough = f.size() > 1;
+        JsonDocument check;
+        const bool ok = bigEnough && !deserializeJson(check, f);
+        f.close();
+        return ok;
+    }
+
+    // Copies [from] over [to] (used when a rename onto an existing file is not possible).
+    bool copyFile(const char* from, const char* to) {
+        File in = SPIFFS.open(from, "r");
+        if (!in) return false;
+        File out = SPIFFS.open(to, "w");
+        if (!out) { in.close(); return false; }
+        uint8_t buffer[128];
+        bool ok = true;
+        while (in.available()) {
+            const size_t n = in.read(buffer, sizeof(buffer));
+            if (n == 0 || out.write(buffer, n) != n) { ok = false; break; }
+        }
+        in.close();
+        out.close();
+        return ok;
+    }
+
+    // The temporary file is complete: it becomes the settings file. The old file is removed only now.
+    bool promoteTempConfig() {
+        if (!validJsonFile(kConfigTemp)) {
+            SPIFFS.remove(kConfigTemp);
+            return false;               // the old settings file was not touched
+        }
+        SPIFFS.remove(kConfigFile);
+        if (SPIFFS.rename(kConfigTemp, kConfigFile)) return true;
+        const bool copied = copyFile(kConfigTemp, kConfigFile);    // rename refused: write the file directly, as before
+        SPIFFS.remove(kConfigTemp);
+        return copied;
+    }
+
+    // Start-up: a save that was cut off leaves the temporary file behind.
+    void recoverInterruptedSave() {
+        if (!SPIFFS.exists(kConfigTemp)) return;
+        if (!SPIFFS.exists(kConfigFile) || !validJsonFile(kConfigFile)) {
+            Serial.println("Settings file missing or damaged, restoring the last complete save");
+            if (promoteTempConfig()) return;
+        }
+        SPIFFS.remove(kConfigTemp);     // the settings file is fine: the temporary file is a cut-off save
+    }
+
+}
+
 bool Configuration::writeFile() {
 
     Serial.println("Saving config..");
 
     JsonDocument data;
-    File configFile = SPIFFS.open("/tracker_conf.json", "w");
+    File configFile = SPIFFS.open(kConfigTemp, "w");
 
     if (!configFile) {
         Serial.println("Error: Could not open config file for writing");
@@ -125,19 +184,25 @@ bool Configuration::writeFile() {
         data["other"]["cadActive"]                  = cadActive;
         data["other"]["email"]                      = email;
 
-        serializeJson(data, configFile);
+        const size_t written = serializeJson(data, configFile);
         configFile.close();
-        return true;
+        if (written == 0) {
+            SPIFFS.remove(kConfigTemp);
+            return false;
+        }
+        return promoteTempConfig();
     } catch (...) {
         Serial.println("Error: Exception occurred while saving config");
         configFile.close();
+        SPIFFS.remove(kConfigTemp);
         return false;
     }
 }
 
 bool Configuration::readFile() {
     Serial.println("Reading config..");
-    File configFile = SPIFFS.open("/tracker_conf.json", "r");
+    recoverInterruptedSave();
+    File configFile = SPIFFS.open(kConfigFile, "r");
 
     if (configFile) {
         bool needsRewrite = false;
@@ -449,6 +514,7 @@ Configuration::Configuration() {
     }
     Serial.println("SPIFFS Ready");
 
+    recoverInterruptedSave();    // a save that was cut off by a power loss
     if (!SPIFFS.exists("/tracker_conf.json")) {
         Serial.println("Config not found, creating default...");
         setDefaultValues();
