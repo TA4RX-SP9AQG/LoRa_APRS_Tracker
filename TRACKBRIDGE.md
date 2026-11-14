@@ -101,6 +101,13 @@ settings, characteristic flags, callbacks), `src/tb_ble_control.cpp` (code gener
 try again; if the setting must be undone without a connection, flash with "Erase device". The iOS aprs.fi app and other
 generic BLE KISS clients do not support passkey pairing from this firmware's point of view as tested; leave the option off for them.
 
+### GPS eco mode and the screen (Heltec Wireless Tracker)
+
+On this board the `VEXT_CTRL` pin powers the GPS **and the TFT**. The original firmware cut it when the GPS went to sleep (GPS eco
+mode), which left a lit but blank screen: no image, no pairing code, no reaction to the button. In this edition (4.0.1-tb4) the GPS
+is only marked as sleeping and Vext stays on, so the screen always works; the cost is that GPS eco mode saves less battery on this
+board. The power is still cut when the tracker shuts itself down for a low battery.
+
 ### Simplified tracker mode and the screen
 
 In the stock firmware "simplified tracker mode" switches the button off, so a screen that went to sleep (display eco mode) could not be

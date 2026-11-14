@@ -188,7 +188,9 @@ namespace POWER_Utils {
             #endif
         #endif
         #ifdef HELTEC_WIRELESS_TRACKER
-            vext_ctrl_OFF();
+            // TrackBridge: on this board Vext (VEXT_CTRL, "to turn on GPS and TFT") feeds the TFT as well as the GPS. Cutting it for
+            // GPS eco mode switched the display off while its backlight stayed on (a blank, lit screen that no button brings back,
+            // and no PIN could be shown). The GPS is only marked as sleeping here; Vext stays on so the screen keeps working.
         #endif
         gpsIsActive = false;
     }
