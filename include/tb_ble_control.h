@@ -24,6 +24,7 @@
 #define TB_BLE_CONTROL_H_
 
 #include <NimBLEDevice.h>
+#include "tb_tnc.h"
 
 namespace TB_BLE_CONTROL {
 
@@ -35,6 +36,11 @@ namespace TB_BLE_CONTROL {
 
     // Bluetooth task: a phone connected or disconnected (only sets a flag; the loop resets the session).
     void connectionChanged();
+
+    // TNC mode: what the tracker may transmit by itself right now, and the mode in effect (see tb_tnc.h).
+    // Main loop task only.
+    TB::TxPolicy txPolicy();
+    int tncEffective();
 
     // True while a pairing PIN is on the screen (other full-screen messages must wait).
     bool pinActive();

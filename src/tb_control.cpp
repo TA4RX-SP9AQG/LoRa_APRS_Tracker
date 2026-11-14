@@ -271,6 +271,8 @@ bool applyAll(JsonObjectConst cmd, EditableSettings& s, char* bad, bool& any) {
             if (!v.is<JsonObjectConst>() || !applyBluetooth(v.as<JsonObjectConst>(), s, bad)) { if (!bad[0]) setField(bad, nullptr, k); return false; }
         } else if (!strcmp(k, "tel")) {
             if (!readBool(v, s.telemetry)) { setField(bad, nullptr, k); return false; }
+        } else if (!strcmp(k, "tnc")) {
+            if (!readIntAsInt(v, 0, 3, s.tncMode)) { setField(bad, nullptr, k); return false; }
         } else {
             setField(bad, nullptr, k);
             return false;

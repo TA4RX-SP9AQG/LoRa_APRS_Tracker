@@ -25,8 +25,8 @@
       {
         "name": "firmware.bin",
         "offset": 65536,
-        "size": 1469616,
-        "sha256": "6f9a9f5bdbb52901db09bf0e55226b4d676abb70e88ed84934d277498b4f8dfc"
+        "size": 1471712,
+        "sha256": "8adfe311955082af7ff50841ca59f6facf30624bb48b5f2fbbf9a807be9c155a"
       }
     ],
     "tr": [
@@ -51,8 +51,8 @@
       {
         "name": "firmware.bin",
         "offset": 65536,
-        "size": 1470016,
-        "sha256": "445f31f05e908c1d7abf08c8bca12bc14cb30984cd875323d8644dd5dab50234"
+        "size": 1472128,
+        "sha256": "9ee4fea36be1621a8bed3846fa34b71d3d2402fea6f4e4d8969aae6d4758c381"
       }
     ]
   }

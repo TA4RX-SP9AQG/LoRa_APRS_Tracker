@@ -35,6 +35,7 @@
 
 extern Configuration Config;
 extern bool          displayState;
+extern bool          bluetoothConnected;
 extern uint32_t      displayTime;
 
 namespace {
@@ -113,6 +114,7 @@ namespace {
         s.cad = Config.cadActive;
         strlcpy(s.btName, Config.bluetooth.deviceName.c_str(), sizeof(s.btName));
         s.telemetry = Config.telemetry.active;
+        s.tncMode = Config.tncMode;
     }
 
     bool differs(const char* a, const char* b) {
@@ -162,6 +164,7 @@ namespace {
         if (staged.cad != base.cad) c.cadActive = staged.cad;
         if (differs(staged.btName, base.btName)) c.bluetooth.deviceName = staged.btName;
         if (staged.telemetry != base.telemetry) c.telemetry.active = staged.telemetry;
+        if (staged.tncMode != base.tncMode) c.tncMode = staged.tncMode;
     }
 
     const char* kSettingsFile = "/tracker_conf.json";
@@ -240,7 +243,40 @@ namespace {
 
 }
 
+namespace {
+
+    // TNC mode: when did the phone go away? (Smart mode waits a little before the tracker beacons again.)
+    bool        phoneWasConnected = false;
+    bool        recentlyDisconnected = false;
+    uint32_t    lastDisconnectMs = 0;
+
+    uint32_t msSinceDisconnect() {
+        const bool connected = bluetoothConnected;
+        const uint32_t now = millis();
+        if (phoneWasConnected && !connected) {
+            recentlyDisconnected = true;
+            lastDisconnectMs = now;
+        }
+        phoneWasConnected = connected;
+        if (!recentlyDisconnected) return 0xFFFFFFFFu;
+        const uint32_t since = now - lastDisconnectMs;
+        if (since >= TB::kTncResumeDelayMs) recentlyDisconnected = false;    // latch, so a millis() wrap cannot bring the wait back
+        return since;
+    }
+
+}
+
 namespace TB_BLE_CONTROL {
+
+    TB::TxPolicy txPolicy() {
+        const uint32_t since = msSinceDisconnect();
+        return TB::txPolicyFor(TB::tncModeFrom(Config.tncMode), bluetoothConnected, since);
+    }
+
+    int tncEffective() {
+        const uint32_t since = msSinceDisconnect();
+        return static_cast<int>(TB::effectiveTncMode(TB::tncModeFrom(Config.tncMode), bluetoothConnected, since));
+    }
 
     void setup(NimBLEService* service) {
         if (!service) return;
@@ -268,6 +304,7 @@ namespace TB_BLE_CONTROL {
             controller.onDisconnect(-1);    // a new or lost connection never inherits a permission
         }
         controller.tick(now);
+        msSinceDisconnect();    // notice a phone going away even when nothing asks for the TNC policy
         if (restartPlanned && static_cast<int32_t>(now - restartAtMs) >= 0) ESP.restart();
 
         static char cmd[TB_COMMAND_MAX + 2];

@@ -113,6 +113,7 @@ struct EditableSettings {
     bool           cad;
     char           btName[kBtNameLen];
     bool           telemetry;
+    int            tncMode;
 };
 
 // What the glue code has to do after a command.

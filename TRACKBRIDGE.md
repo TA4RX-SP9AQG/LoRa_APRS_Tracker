@@ -48,6 +48,25 @@ answer to the last one (matched by the command's `id`).
 
 The rules (`tb_control.cpp`) have no Arduino code and are tested on a PC with ~3200 checks (`tools/tb_test`).
 
+### TNC modes
+
+Setting `bluetooth.tncMode` (control key `"tnc"`, reported in the status JSON as `"tnc":{"m":set,"e":in effect}`). It decides
+what the tracker transmits **by itself**; packets the phone writes over Bluetooth are always transmitted.
+
+| Mode | Beacons, status, telemetry | Answer / store messages | Digipeat | From the tracker's menu |
+|---|---|---|---|---|
+| 0 Normal | yes | yes (stock behaviour) | if switched on | yes |
+| 1 Full TNC | no | no (stored, not answered, while no phone is connected) | no | no ("TNC mode: no TX") |
+| 2 Semi TNC | yes | only while no phone is connected (the app does it otherwise) | if switched on | yes |
+| 3 Smart | Full while a phone is connected, Semi otherwise; beacons resume 15 s after the phone has gone | | | |
+
+The table is a pure function (`src/tb_tnc.cpp`, tested on a PC); the gates are in `sendBeacon`, `checkStatus`,
+`checkReceivedMessage`, `addToOutputBuffer`, `processOutputBuffer` and the keyboard beacon. Old settings files and new
+trackers are Normal. "A phone is connected" means any Bluetooth connection: in Smart mode a stranger's phone also
+silences the beacons (Bluetooth has no authentication here). In Full mode the app's "Tracker GPS" position source cannot
+work, because the tracker sends no beacons to read the position from. There is no mode indicator on the tracker's
+main screen yet.
+
 ### Known limits
 
 * **The KISS characteristic has no authentication** (as in the original firmware): anyone within Bluetooth range can make a

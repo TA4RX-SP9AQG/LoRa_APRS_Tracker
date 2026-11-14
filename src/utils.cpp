@@ -17,6 +17,7 @@
  */
 
 #include <APRSPacketLib.h>
+#include "tb_ble_control.h"
 #include <logger.h>
 #include <Wire.h>
 #include "configuration.h"
@@ -119,7 +120,7 @@ namespace Utils {
                 uint32_t currentTime = millis();
                 uint32_t statusTx = currentTime - statusTime;
                 lastTx = currentTime - lastTxTime;
-                if (statusTx > 10 * 60 * 1000 && lastTx > 10 * 1000) {
+                if (statusTx > 10 * 60 * 1000 && lastTx > 10 * 1000 && TB_BLE_CONTROL::txPolicy().beacons) {
                     LoRa_Utils::sendNewPacket(APRSPacketLib::generateStatusPacket(currentBeacon->callsign, "APLRT1", Config.path, currentBeacon->status));
                     statusUpdate = false;
                 }

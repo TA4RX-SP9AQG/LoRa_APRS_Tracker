@@ -69,6 +69,7 @@ bool Configuration::writeFile() {
             data["bluetooth"]["useBLE"]             = true; // fixed as BLE
         #endif
         data["bluetooth"]["useKISS"]                = bluetooth.useKISS;
+        data["bluetooth"]["tncMode"]                = tncMode;
 
         for (int i = 0; i < loraTypes.size(); i++) {
             data["lora"][i]["frequency"]                = loraTypes[i].frequency;
@@ -190,6 +191,8 @@ bool Configuration::readFile() {
             bluetooth.useBLE            = true;    // fixed as BLE
             bluetooth.useKISS           = data["bluetooth"]["useKISS"] | true;    // true=KISS,  false=TNC2
         #endif
+        tncMode                         = data["bluetooth"]["tncMode"] | 0;      // a file without it (older firmware) means normal
+        if (tncMode < 0 || tncMode > 3) tncMode = 0;
 
         JsonArray LoraTypesArray = data["lora"];
         for (int j = 0; j < LoraTypesArray.size(); j++) {
@@ -340,6 +343,7 @@ void Configuration::setDefaultValues() {
         bluetooth.useBLE            = true;    // fixed as BLE
         bluetooth.useKISS           = true;
     #endif
+    tncMode                         = 0;
 
     for (int j = 0; j < 4; j++) {
         LoraType loraType;

@@ -62,6 +62,8 @@ struct InfoData {
     int         powerDbm;
     int         storedMessages;
     uint32_t    freeHeap;
+    int         tncMode;            // as set (see tb_tnc.h)
+    int         tncEffective;       // in effect right now
 };
 
 struct BeaconData {

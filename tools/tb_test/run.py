@@ -53,6 +53,11 @@ def main():
     raw += control_run.stdout
     if control_run.returncode not in (0, 1) or b"SUMMARY" not in control_run.stdout:
         sys.exit("control test crashed (exit code %s): %s" % (control_run.returncode, control_run.stderr.decode("utf-8", "replace")[-400:]))
+    tnc = build("test_tb_tnc.cpp", ["tb_tnc.cpp"], "tb_tnc_test.exe")
+    tnc_run = subprocess.run([str(tnc)], capture_output=True)
+    raw += tnc_run.stdout
+    if tnc_run.returncode not in (0, 1) or b"SUMMARY" not in tnc_run.stdout:
+        sys.exit("tnc test crashed (exit code %s): %s" % (tnc_run.returncode, tnc_run.stderr.decode("utf-8", "replace")[-400:]))
     cases = 0
     failures = []
     names = {}
@@ -61,10 +66,10 @@ def main():
             continue
         parts = line.split(b"\t", 4)
         if parts[0] == b"FAIL":
-            failures.append("control test: " + line.decode("utf-8", "replace")[5:])
+            failures.append("test: " + line.decode("utf-8", "replace")[5:])
             continue
         if parts[0] == b"SUMMARY":
-            print("control:", line.decode("utf-8", "replace").split(chr(9), 1)[1])
+            print("checks:", line.decode("utf-8", "replace").split(chr(9), 1)[1])
             continue
         if parts[0] == b"OVERRUN":
             failures.append("buffer overrun: " + line.decode("utf-8", "replace"))
@@ -106,6 +111,7 @@ def main():
     info = names.get("info_normal", {})
     expect(info.get("bat", {}).get("p") == 87 and info.get("gps", {}).get("sat") == 9, "info_normal: wrong values")
     expect(info.get("up") == 4000000000, "info_normal: uptime not preserved as unsigned")
+    expect(info.get("tnc") == {"m": 3, "e": 1}, "info_normal: TNC mode (set and in effect) missing")
     nb = names.get("info_no_battery_no_fix", {})
     expect(nb.get("bat") is None or nb["bat"].get("p") is None, "info_no_battery: battery should be absent/unknown")
     expect(nb.get("gps", {}).get("fix") == 0, "info_no_battery: fix should be 0")

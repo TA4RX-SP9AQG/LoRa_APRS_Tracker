@@ -17,6 +17,7 @@
  */
 
 #include <APRSPacketLib.h>
+#include "tb_ble_control.h"
 #include "tb_lang.h"
 #include <TinyGPS++.h>
 #include <logger.h>
@@ -756,8 +757,12 @@ namespace KEYBOARD_Utils {
                 if (messageText.length() > 67) messageText = messageText.substring(0, 67);
                 String packet = APRSPacketLib::generateBase91GPSBeaconPacket(currentBeacon->callsign, "APLRT1", Config.path, currentBeacon->overlay, APRSPacketLib::encodeGPSIntoBase91(gps.location.lat(),gps.location.lng(), gps.course.deg(), gps.speed.knots(), currentBeacon->symbol, Config.sendAltitude, gps.altitude.feet(), sendStandingUpdate));
                 packet += messageText;
-                displayShow("<<< TX >>>", "", packet,100);
-                LoRa_Utils::sendNewPacket(packet);
+                if (TB_BLE_CONTROL::txPolicy().manualTx) {
+                    displayShow("<<< TX >>>", "", packet,100);
+                    LoRa_Utils::sendNewPacket(packet);
+                } else {
+                    displayShow("  TNC", "", TB_T("TNC mode: no TX", "TNC modu: yayin yok"), 1500);
+                }
                 messageText = "";
                 menuDisplay = 63;
             } else if (key == 8) {

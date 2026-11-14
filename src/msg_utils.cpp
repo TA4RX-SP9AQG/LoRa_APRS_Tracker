@@ -17,6 +17,7 @@
  */
 
 #include <APRSPacketLib.h>
+#include "tb_ble_control.h"
 #include "tb_lang.h"
 #include <TinyGPS++.h>
 #include <SPIFFS.h>
@@ -44,6 +45,7 @@ extern bool                 messageLed;
 extern uint32_t             messageLedTime;
 
 extern bool                 digipeaterActive;
+extern bool                 bluetoothConnected;
 
 extern int                  ackRequestNumber;
 
@@ -284,6 +286,10 @@ namespace MSG_Utils {
     }
 
     void addToOutputBuffer(uint8_t typeOfMessage, const String& station, const String& textMessage) {
+        if (!TB_BLE_CONTROL::txPolicy().manualTx) {    // TrackBridge full TNC mode: the tracker originates nothing
+            displayShow("  TNC", "", TB_T("TNC mode: no TX", "TNC modu: yayin yok"), 1500);
+            return;
+        }
         bool alreadyInBuffer;
         if (typeOfMessage == 1) {
             alreadyInBuffer = false;
@@ -323,6 +329,12 @@ namespace MSG_Utils {
     }
 
     void processOutputBuffer() {
+        if (!TB_BLE_CONTROL::txPolicy().manualTx) {    // TrackBridge full TNC mode: nothing queued earlier may go out
+            outputMessagesBuffer.clear();
+            outputAckRequestBuffer.clear();
+            ackRequestState = false;
+            return;
+        }
         if (!outputMessagesBuffer.empty() && (millis() - lastMsgRxTime) >= 6000 && (millis() - lastTxTime) > 3000) {
             String addressee = outputMessagesBuffer[0].substring(0, outputMessagesBuffer[0].indexOf(","));
             String message = outputMessagesBuffer[0].substring(outputMessagesBuffer[0].indexOf(",") + 1);
@@ -422,8 +434,10 @@ namespace MSG_Utils {
 
                 const String& infoField = APRSPacketLib::checkForStartingBytes(packet.text.substring(packet.text.indexOf(":") + 1));   // full info field (after path): payload is only the comment on gps/Mic-E since APRSPacketLib 1.0.7
                 if (check15SegBuffer(lastReceivedPacket.sender, infoField)) {
+                    const TB::TxPolicy tbPolicy = TB_BLE_CONTROL::txPolicy();    // TrackBridge TNC mode
+                    const bool tbKeep = tbPolicy.messaging || !bluetoothConnected;    // store/show: also when no phone would see it
 
-                    if (digipeaterActive && lastReceivedPacket.addressee != currentBeacon->callsign) {
+                    if (digipeaterActive && tbPolicy.digipeat && lastReceivedPacket.addressee != currentBeacon->callsign) {
                         String digipeatedPacket = APRSPacketLib::checkForStartingBytes(APRSPacketLib::generateDigipeatedPacket(packet.text, currentBeacon->callsign, "WIDE1-1"));    // tracker digi = WIDE1-1 fill-in only (not the beacon path)
                         if (digipeatedPacket == "X") {
                             logger.log(logging::LoggerLevel::LOGGER_LEVEL_WARN, "Main", "%s", "Packet won't be Repeated (Missing WIDEn-N)");
@@ -444,16 +458,16 @@ namespace MSG_Utils {
                         }
                         if (lastReceivedPacket.payload.indexOf("{") >= 0) {
                             String ackMessage = APRSPacketLib::generateAckMessage(lastReceivedPacket.payload);
-                            if (ackMessage != "") MSG_Utils::addToOutputBuffer(0, lastReceivedPacket.sender, ackMessage);     // "" if '{' carries no ID
+                            if (ackMessage != "" && tbPolicy.messaging) MSG_Utils::addToOutputBuffer(0, lastReceivedPacket.sender, ackMessage);     // "" if '{' carries no ID
                             lastMsgRxTime = millis();
                             lastReceivedPacket.payload = lastReceivedPacket.payload.substring(0, lastReceivedPacket.payload.indexOf("{"));
                         }
 
-                        if (Config.notification.buzzerActive && Config.notification.messageRxBeep) NOTIFICATION_Utils::messageBeep();
+                        if (Config.notification.buzzerActive && Config.notification.messageRxBeep && tbPolicy.messaging) NOTIFICATION_Utils::messageBeep();
 
                         if (lastReceivedPacket.payload.indexOf("ping") == 0 || lastReceivedPacket.payload.indexOf("Ping") == 0 || lastReceivedPacket.payload.indexOf("PING") == 0) {
                             lastMsgRxTime = millis();
-                            MSG_Utils::addToOutputBuffer(0, lastReceivedPacket.sender, "pong, 73!");
+                            if (tbPolicy.messaging) MSG_Utils::addToOutputBuffer(0, lastReceivedPacket.sender, "pong, 73!");
                         }
 
                         if (lastReceivedPacket.sender == "CA2RXU-15" && lastReceivedPacket.payload.indexOf("WX") == 0) {    // WX = WeatherReport
@@ -490,7 +504,7 @@ namespace MSG_Utils {
                             menuDisplay = 300;
                             menuTime = millis();
                         } else if (lastReceivedPacket.sender == "WLNK-1") {
-                            if (winlinkStatus == 0 && !Config.simplifiedTrackerMode) {
+                            if (winlinkStatus == 0 && !Config.simplifiedTrackerMode && tbKeep) {
                                 lastMsgRxTime = millis();
                                 if (lastReceivedPacket.payload.indexOf("ack") != 0) {
                                     saveNewMessage(0, lastReceivedPacket.sender, lastReceivedPacket.payload);
@@ -531,7 +545,7 @@ namespace MSG_Utils {
                                 saveNewMessage(1, lastReceivedPacket.sender, lastReceivedPacket.payload);
                             }
                         } else {
-                            if (!Config.simplifiedTrackerMode) {
+                            if (!Config.simplifiedTrackerMode && tbKeep) {    // with a phone connected the app shows and answers it
                                 lastMsgRxTime = millis();
 
                                 #ifdef HAS_TFT

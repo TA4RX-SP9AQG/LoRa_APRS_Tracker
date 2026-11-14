@@ -143,6 +143,7 @@ public:
     bool    sendAltitude;
     bool    disableGPS;
     bool    cadActive;
+    int     tncMode;            // TrackBridge: 0 normal, 1 full TNC, 2 semi TNC, 3 smart (see tb_tnc.h)
 
     void setDefaultValues();
     bool writeFile();

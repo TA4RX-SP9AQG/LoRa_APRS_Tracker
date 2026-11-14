@@ -17,6 +17,7 @@
  */
 
 #include <APRSPacketLib.h>
+#include "tb_ble_control.h"
 #include <TinyGPS++.h>
 #include <SPIFFS.h>
 #include "telemetry_utils.h"
@@ -192,6 +193,11 @@ namespace STATION_Utils {
     }
 
     void sendBeacon() {
+        if (!TB_BLE_CONTROL::txPolicy().beacons) {    // TrackBridge TNC mode: the tracker does not beacon by itself now
+            sendUpdate = false;
+            if (currentBeacon->gpsEcoMode) gpsShouldSleep = true;    // keep the GPS eco cycle going without a beacon
+            return;
+        }
         if (sendStartTelemetry && ((Config.battery.sendVoltage && Config.battery.voltageAsTelemetry) || (Config.telemetry.sendTelemetry && wxModuleFound)) && lastTxTime > 0) TELEMETRY_Utils::sendEquationsUnitsParameters();
 
         String path = Config.path;

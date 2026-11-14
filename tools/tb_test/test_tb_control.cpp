@@ -488,6 +488,23 @@ int main() {
         CHECK(TB::kFreqMinHz == 150000000L && TB::kFreqMaxHz == 960000000L && TB::kPowerMaxDbm == 22 && TB::kSfMin == 5, "SX1262 limits");
     }
 
+    // ---- TNC mode ----
+    {
+        const char* ok[] = {"{\"id\":4,\"op\":\"set\",\"tnc\":0}", "{\"id\":4,\"op\":\"set\",\"tnc\":1}", "{\"id\":4,\"op\":\"set\",\"tnc\":2}", "{\"id\":4,\"op\":\"set\",\"tnc\":3}"};
+        for (int i = 0; i < 4; i++) {
+            Rig t;
+            t.signIn();
+            TB::CommandResult x = t.send(ok[i]);
+            CHECK(x.ok && t.c.staged().tncMode == i, "tnc 0..3 is accepted and staged");
+        }
+        const char* no[] = {"{\"id\":4,\"op\":\"set\",\"tnc\":-1}", "{\"id\":4,\"op\":\"set\",\"tnc\":4}", "{\"id\":4,\"op\":\"set\",\"tnc\":\"x\"}", "{\"id\":4,\"op\":\"set\",\"tnc\":1.5}", "{\"id\":4,\"op\":\"set\",\"tnc\":true}"};
+        for (const char* j : no) {
+            Rig t;
+            t.signIn();
+            CHECK(is(t.send(j), false, "invalid"), "a bad tnc value is refused");
+        }
+    }
+
     // ---- individual validators ----
     CHECK(TB::validCallsign("SP9AQG-9") && TB::validCallsign("TA4RX-7") && TB::validCallsign("N0CALL") && TB::validCallsign("SP9AQG-15"),
           "good callsigns");

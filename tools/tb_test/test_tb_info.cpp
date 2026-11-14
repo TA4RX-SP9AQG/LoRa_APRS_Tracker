@@ -58,6 +58,8 @@ static TB::InfoData sampleInfo() {
     d.powerDbm = 20;
     d.storedMessages = 3;
     d.freeHeap = 123456;
+    d.tncMode = 3;
+    d.tncEffective = 1;
     return d;
 }
 
