@@ -1,6 +1,6 @@
 {
   "version": "4.0.1-tb1",
-  "source_commit": "2625ee880e896ac437e9abdc2a30e21c4d1c1014",
+  "source_commit": "9692424c715f38ce488e14b74ad8a5ddfbb618a1",
   "built": "2026-11-14",
   "tested_on_hardware": false,
   "files": {
@@ -26,8 +26,8 @@
       {
         "name": "firmware.bin",
         "offset": 65536,
-        "size": 1476592,
-        "sha256": "86c443a48ee87b677e9f81c9b8e9570da8f19f96c2fa6f2aed1594ca4890ce3e"
+        "size": 1477392,
+        "sha256": "ab5e22ff32dafe0ce0cf57bc493da579a6d44b56ee476ce075ff9e0da8c15bf4"
       }
     ],
     "tr": [
@@ -52,8 +52,8 @@
       {
         "name": "firmware.bin",
         "offset": 65536,
-        "size": 1477024,
-        "sha256": "814284a18633b24b515400a7f9c029319ba0bdf5e8ab2782578c2136079dfc48"
+        "size": 1477792,
+        "sha256": "305990356e1ccafd49fa089d7eb95e02b72bb46353207fa6f2e18533567f45c8"
       }
     ]
   }
