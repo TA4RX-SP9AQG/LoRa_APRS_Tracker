@@ -17,6 +17,7 @@ import json
 import re
 import shutil
 import struct
+import subprocess
 import sys
 from pathlib import Path
 
@@ -30,6 +31,17 @@ PARTS = [("bootloader.bin", 0x0), ("partitions.bin", 0x8000), ("boot_app0.bin", 
 CHIP_ID_ESP32S3 = 9
 APP_OFFSET, APP_SIZE = 0x10000, 0x300000
 SPIFFS_OFFSET, SPIFFS_SIZE = 0x310000, 0xE0000   # settings and messages: must stay where the stock firmware keeps them
+
+
+def source_state():
+    """The commit the firmware was built from (GPL-3.0 section 6: the page must offer the exact source) and whether the
+    firmware sources have uncommitted changes."""
+    def git(*args):
+        return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    try:
+        return git("rev-parse", "HEAD"), bool(git("status", "--porcelain", "--", "src", "include", "platformio.ini", "common_settings.ini", "variants"))
+    except (OSError, subprocess.CalledProcessError):
+        return None, True
 
 
 def write_lf(path, text):
@@ -125,8 +137,12 @@ def main():
             ],
         }
         write_lf((DOCS / ("manifest-" + lang + ".json")), json.dumps(manifest, indent=2, ensure_ascii=False) + chr(10))
+    commit, dirty = source_state()
+    if dirty:
+        print("WARNING: the sources have uncommitted changes; commit them before publishing, the page links to this commit")
     info = {
         "version": version,
+        "source_commit": commit,
         "built": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"),
         "tested_on_hardware": bool(tested or previous.get("tested_on_hardware", False)),
         "files": files_info,

@@ -3,7 +3,11 @@
 This branch (`trackbridge`) is a fork of [richonguzman/LoRa_APRS_Tracker](https://github.com/richonguzman/LoRa_APRS_Tracker)
 (Ricardo Guzman, CA2RXU, GPL-3.0-or-later) made to work with the [TrackBridge](https://github.com/TA4RX-SP9AQG/TrackBridge)
 Android app. All original copyright notices are kept; this edition is independent and not endorsed by the original authors.
-Licence: GPL-3.0-or-later, the same as the original.
+Licence: GPL-3.0-or-later, the same as the original. Third-party libraries: see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+**Modification notice (GPL-3.0 section 5a):** this edition was modified from the original LoRa APRS Tracker 4.0.1 in
+November 2026 by the TrackBridge project; the changes are listed below and in the git history of this branch. The web
+flasher links to the exact source commit of the binaries it offers (GPL-3.0 section 6).
 
 ## What is different
 

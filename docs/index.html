@@ -94,7 +94,8 @@
 
   <footer>
     <p data-i="legal"></p>
-    <p><a href="https://github.com/TA4RX-SP9AQG/LoRa_APRS_Tracker/tree/trackbridge" data-i="source">Source code</a> ·
+    <p><a id="source-link" href="https://github.com/TA4RX-SP9AQG/LoRa_APRS_Tracker/tree/trackbridge" data-i="source">Source code</a> ·
+       <a href="https://github.com/TA4RX-SP9AQG/LoRa_APRS_Tracker/blob/trackbridge/THIRD_PARTY_NOTICES.md" data-i="notices">Third-party licences</a> ·
        <a href="https://github.com/richonguzman/LoRa_APRS_Tracker" data-i="upstream">Original project</a> ·
        <a href="vendor/esp-web-tools/LICENSE">ESP Web Tools (Apache-2.0)</a></p>
   </footer>
@@ -130,7 +131,7 @@
         h_files: 'What is written',
         files_help: 'These four files are written to the tracker’s flash. The settings and messages area is not touched. Checksums (SHA-256):',
         legal: 'Based on LoRa APRS Tracker by Ricardo Guzman (CA2RXU) and contributors, licensed GPL-3.0-or-later. This build is independent and not endorsed by the original authors. Provided without warranty; you are responsible for what your station transmits.',
-        source: 'Source code', upstream: 'Original project',
+        source: 'Source code', notices: 'Third-party licences', upstream: 'Original project',
         version: 'Version', built: 'built', tested: 'tested on hardware',
         yes: 'yes', no: 'no',
       },
@@ -163,7 +164,7 @@
         h_files: 'Neler yazılır',
         files_help: 'Bu dört dosya tracker’ın flash belleğine yazılır. Ayarların ve mesajların tutulduğu bölüme dokunulmaz. Sağlama toplamları (SHA-256):',
         legal: 'Ricardo Guzman (CA2RXU) ve katkıda bulunanların LoRa APRS Tracker projesine dayanır, GPL-3.0-or-later lisanslıdır. Bu sürüm bağımsızdır, orijinal yazarlar tarafından onaylanmış değildir. Garanti verilmez; istasyonunuzun yayınlarından siz sorumlusunuz.',
-        source: 'Kaynak kod', upstream: 'Orijinal proje',
+        source: 'Kaynak kod', notices: 'Üçüncü taraf lisansları', upstream: 'Orijinal proje',
         version: 'Sürüm', built: 'derleme', tested: 'cihazda denendi',
         yes: 'evet', no: 'hayır',
       },
@@ -180,6 +181,10 @@
       document.querySelectorAll('[data-i]').forEach((el) => { if (d[el.dataset.i]) el.textContent = d[el.dataset.i]; });
       document.querySelectorAll('.lang button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === uiLang)));
       document.getElementById('untested').hidden = !info || info.tested_on_hardware === true;
+      if (info && /^[0-9a-f]{40}$/.test(info.source_commit || '')) {
+        // the exact source of the files offered here (GPL-3.0 section 6)
+        document.getElementById('source-link').href = 'https://github.com/TA4RX-SP9AQG/LoRa_APRS_Tracker/tree/' + info.source_commit;
+      }
       if (info) {
         document.getElementById('version').textContent =
           d.version + ' ' + info.version + ' · ' + d.built + ' ' + info.built + ' · ' + d.tested + ': ' + (info.tested_on_hardware ? d.yes : d.no);
