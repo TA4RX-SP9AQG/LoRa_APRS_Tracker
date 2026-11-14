@@ -30,6 +30,7 @@
 #ifndef TB_TNC_H_
 #define TB_TNC_H_
 
+#include <stddef.h>
 #include <stdint.h>
 
 namespace TB {
@@ -56,6 +57,10 @@ TncMode effectiveTncMode(TncMode mode, bool phoneConnected, uint32_t msSinceDisc
 // [msSinceDisconnect] is only looked at when no phone is connected (a huge value when none was ever connected).
 
 TxPolicy txPolicyFor(TncMode mode, bool phoneConnected, uint32_t msSinceDisconnect);
+
+// Four-letter tag for the tracker's main screen (end of the battery row): "" in Normal mode, else "FULL", "SEMI" or
+// "AUTO" (smart). Same in both languages.
+const char* tncTag(TncMode mode);
 
 }  // namespace TB
 

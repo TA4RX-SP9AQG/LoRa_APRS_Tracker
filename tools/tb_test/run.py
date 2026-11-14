@@ -30,9 +30,9 @@ def compiler():
     sys.exit("no host C++ compiler found (install ziglang: uv tool install ziglang)")
 
 
-def build(test_source, sources, out_name, extra_includes=()):
+def build(test_source, sources, out_name, extra_includes=(), defines=()):
     out = HERE / out_name
-    cmd = compiler() + ["-std=c++11", "-I" + str(ROOT / "include")] + ["-I" + str(i) for i in extra_includes] + [
+    cmd = compiler() + ["-std=c++11", "-I" + str(ROOT / "include")] + ["-I" + str(i) for i in extra_includes] + ["-D" + d for d in defines] + [
         "-Wall", "-Wextra", "-O1", "-fsanitize=undefined", str(HERE / test_source)] + [str(ROOT / "src" / x) for x in sources] + ["-o", str(out)]
     try:
         subprocess.run(cmd, check=True)
@@ -53,11 +53,12 @@ def main():
     raw += control_run.stdout
     if control_run.returncode not in (0, 1) or b"SUMMARY" not in control_run.stdout:
         sys.exit("control test crashed (exit code %s): %s" % (control_run.returncode, control_run.stderr.decode("utf-8", "replace")[-400:]))
-    tnc = build("test_tb_tnc.cpp", ["tb_tnc.cpp"], "tb_tnc_test.exe")
-    tnc_run = subprocess.run([str(tnc)], capture_output=True)
-    raw += tnc_run.stdout
-    if tnc_run.returncode not in (0, 1) or b"SUMMARY" not in tnc_run.stdout:
-        sys.exit("tnc test crashed (exit code %s): %s" % (tnc_run.returncode, tnc_run.stderr.decode("utf-8", "replace")[-400:]))
+    for lang_name, defs in (("en", ()), ("tr", ("TB_LANG_TR",))):    # the screen texts exist in both languages
+        tnc = build("test_tb_tnc.cpp", ["tb_tnc.cpp"], "tb_tnc_" + lang_name + ".exe", defines=defs)
+        tnc_run = subprocess.run([str(tnc)], capture_output=True)
+        raw += tnc_run.stdout
+        if tnc_run.returncode not in (0, 1) or b"SUMMARY" not in tnc_run.stdout:
+            sys.exit("tnc test crashed (exit code %s): %s" % (tnc_run.returncode, tnc_run.stderr.decode("utf-8", "replace")[-400:]))
     radio = build("test_tb_radio.cpp", ["tb_radio.cpp"], "tb_radio_test.exe")
     radio_run = subprocess.run([str(radio)], capture_output=True)
     raw += radio_run.stdout

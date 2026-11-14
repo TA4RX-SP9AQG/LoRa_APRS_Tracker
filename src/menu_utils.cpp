@@ -20,6 +20,7 @@
 #include "tb_radio.h"
 #include "tb_lang.h"
 #include "tb_ble_control.h"
+#include "tb_tnc.h"
 #include <TinyGPS++.h>
 #include <vector>
 #include "notification_utils.h"
@@ -892,6 +893,20 @@ namespace MENU_Utils {
                     #endif
                 } else {
                     sixthRowMainMenu = TB_T("No Battery Connected", "Pil bagli degil");
+                }
+                {   // TrackBridge: the TNC mode as a four-letter tag at the end of the battery row (nothing in Normal mode,
+                    // and nothing when the row has no room left)
+                    #ifdef HELTEC_WIRELESS_TRACKER
+                    const unsigned int rowWidth = 26;
+                    #else
+                    const unsigned int rowWidth = 21;
+                    #endif
+                    const char* tncTag = TB::tncTag(TB::tncModeFrom(Config.tncMode));
+                    const unsigned int tagLength = strlen(tncTag);
+                    if (tagLength > 0 && sixthRowMainMenu.length() + 1 + tagLength <= rowWidth) {
+                        while (sixthRowMainMenu.length() + tagLength < rowWidth) sixthRowMainMenu += ' ';
+                        sixthRowMainMenu += tncTag;
+                    }
                 }
                 displayShow(firstRowMainMenu,
                             secondRowMainMenu,

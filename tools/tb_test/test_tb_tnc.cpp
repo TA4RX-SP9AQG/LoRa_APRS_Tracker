@@ -2,6 +2,7 @@
 // Built and run by tools/tb_test/run.py. Prints "FAIL <message>" lines and a "SUMMARY" line.
 
 #include <cstdio>
+#include <cstring>
 
 #include "../../include/tb_tnc.h"
 
@@ -71,6 +72,19 @@ int main() {
     if (TB::tncModeFrom(-1) != TB::kTncNormal || TB::tncModeFrom(4) != TB::kTncNormal || TB::tncModeFrom(1000) != TB::kTncNormal) {
         gFailures++;
         std::printf("FAIL\tunknown numbers must mean Normal\n");
+    }
+
+    // the main-screen tag: nothing in Normal, four capital letters otherwise
+    {
+        const TB::TncMode modes[] = {TB::kTncNormal, TB::kTncFull, TB::kTncSemi, TB::kTncSmart};
+        for (TB::TncMode m : modes) {
+            gChecks++;
+            const char* tag = TB::tncTag(m);
+            if ((m == TB::kTncNormal) != (tag[0] == 0) || (m != TB::kTncNormal && std::strlen(tag) != 4)) {
+                gFailures++;
+                std::printf("FAIL\ttag for mode %d: \"%s\"\n", (int)m, tag);
+            }
+        }
     }
 
     std::printf("SUMMARY\t%d checks, %d failed\n", gChecks, gFailures);

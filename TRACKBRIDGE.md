@@ -81,8 +81,9 @@ The table is a pure function (`src/tb_tnc.cpp`, tested on a PC); the gates are i
 `checkReceivedMessage`, `addToOutputBuffer`, `processOutputBuffer` and the keyboard beacon. Old settings files and new
 trackers are Normal. "A phone is connected" means any Bluetooth connection: in Smart mode a stranger's phone also
 silences the beacons (Bluetooth has no authentication here). In Full mode the app's "Tracker GPS" position source cannot
-work, because the tracker sends no beacons to read the position from. There is no mode indicator on the tracker's
-main screen yet.
+work, because the tracker sends no beacons to read the position from. The tracker's main screen shows the mode as a four-letter tag at the right end of the
+battery row: `FULL`, `SEMI` or `AUTO` (Smart); nothing in Normal mode, and nothing when the row has no room left
+(it needs 5 free characters; the Heltec Wireless Tracker row is 26 characters wide).
 
 ### Known limits
 

@@ -69,4 +69,13 @@ TxPolicy txPolicyFor(TncMode mode, bool phoneConnected, uint32_t msSinceDisconne
     return p;
 }
 
+const char* tncTag(TncMode mode) {
+    switch (mode) {
+        case kTncFull: return "FULL";
+        case kTncSemi: return "SEMI";
+        case kTncSmart: return "AUTO";
+        default: return "";
+    }
+}
+
 }  // namespace TB
