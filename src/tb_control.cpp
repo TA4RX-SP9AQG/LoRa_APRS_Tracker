@@ -271,6 +271,24 @@ bool applyAll(JsonObjectConst cmd, EditableSettings& s, char* bad, bool& any) {
             if (!v.is<JsonObjectConst>() || !applyBluetooth(v.as<JsonObjectConst>(), s, bad)) { if (!bad[0]) setField(bad, nullptr, k); return false; }
         } else if (!strcmp(k, "tel")) {
             if (!readBool(v, s.telemetry)) { setField(bad, nullptr, k); return false; }
+        } else if (!strcmp(k, "badd")) {
+            // a new beacon profile at the end, starting as a copy of the first one's callsign
+            long one = 0;
+            if (!readInt(v, 1, 1, one) || s.beaconCount >= kMaxBeacons) { setField(bad, nullptr, k); return false; }
+            EditableBeacon& n = s.beacons[s.beaconCount];
+            memset(&n, 0, sizeof(n));
+            copyText(n.callsign, sizeof(n.callsign), s.beaconCount > 0 ? s.beacons[0].callsign : "NOCALL-7");
+            copyText(n.symbol, sizeof(n.symbol), "[");
+            copyText(n.overlay, sizeof(n.overlay), "/");
+            n.smartBeacon = true;
+            n.origin = -1;
+            s.beaconCount++;
+        } else if (!strcmp(k, "bdel")) {
+            // remove one profile; the last one cannot be removed
+            long index = 0;
+            if (s.beaconCount <= 1 || !readInt(v, 0, static_cast<long>(s.beaconCount) - 1, index)) { setField(bad, nullptr, k); return false; }
+            for (size_t j = static_cast<size_t>(index); j + 1 < s.beaconCount; j++) s.beacons[j] = s.beacons[j + 1];
+            s.beaconCount--;
         } else if (!strcmp(k, "tnc")) {
             if (!readIntAsInt(v, 0, 3, s.tncMode)) { setField(bad, nullptr, k); return false; }
         } else {

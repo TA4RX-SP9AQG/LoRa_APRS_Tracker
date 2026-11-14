@@ -48,6 +48,13 @@ answer to the last one (matched by the command's `id`).
 
 The rules (`tb_control.cpp`) have no Arduino code and are tested on a PC with ~3200 checks (`tools/tb_test`).
 
+### Beacon profiles
+
+Characteristic `...0016` (READ) lists every beacon profile (up to 5), with as much of the comment and label as fits in 500 bytes
+(`cc` / `lc` flag cut texts). The `set` keys `"badd":1` (append a profile) and `"bdel":i` (remove profile i; the last one cannot be
+removed) change the list. On commit the new list is built from each profile's origin, so Mic-E, status text and long texts of kept
+profiles survive, and the remembered active profile is reset to the first one when profiles moved.
+
 ### TNC modes
 
 Setting `bluetooth.tncMode` (control key `"tnc"`, reported in the status JSON as `"tnc":{"m":set,"e":in effect}`). It decides

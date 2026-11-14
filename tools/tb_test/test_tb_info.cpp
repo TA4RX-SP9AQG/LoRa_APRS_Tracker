@@ -164,6 +164,20 @@ int main() {
         size_t n = TB::buildConfig(c, buf, TB::kMaxPayload);
         emit("config_overflow_degrades", TB::kMaxPayload, n, buf);
     }
+    // 7b. beacon profiles on their own: five fit, long texts are cut and flagged
+    {
+        std::vector<TB::BeaconData> b = sampleBeacons(5, "short");
+        size_t n = TB::buildBeacons(b.data(), b.size(), buf, TB::kMaxPayload);
+        emit("beacons_five_short", TB::kMaxPayload, n, buf);
+        std::vector<TB::BeaconData> l = sampleBeacons(5, "a comment of exactly sixty characters, which is the maximum!");
+        n = TB::buildBeacons(l.data(), l.size(), buf, TB::kMaxPayload);
+        emit("beacons_five_long", TB::kMaxPayload, n, buf);
+        std::vector<TB::BeaconData> many = sampleBeacons(9, "x");
+        n = TB::buildBeacons(many.data(), many.size(), buf, TB::kMaxPayload);
+        emit("beacons_too_many", TB::kMaxPayload, n, buf);
+        n = TB::buildBeacons(nullptr, 0, buf, TB::kMaxPayload);
+        emit("beacons_none", TB::kMaxPayload, n, buf);
+    }
     // 8. config: zero beacons / null pointers
     {
         TB::ConfigData c = {};

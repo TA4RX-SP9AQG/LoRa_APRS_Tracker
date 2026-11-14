@@ -21,7 +21,9 @@
 #include <NimBLEDevice.h>
 #include <SPIFFS.h>
 #include <string.h>
+#include <vector>
 #include "configuration.h"
+#include "station_utils.h"
 #include "display.h"
 #include "tb_ble_control.h"
 #include "tb_control.h"
@@ -88,6 +90,7 @@ namespace {
             s.beacons[i].smartBeacon = b.smartBeaconActive;
             s.beacons[i].smartSetting = b.smartBeaconSetting;
             s.beacons[i].gpsEco = b.gpsEcoMode;
+            s.beacons[i].origin = static_cast<int>(i);
         }
         strlcpy(s.path, Config.path.c_str(), sizeof(s.path));
         s.loraCount = Config.loraTypes.size() < TB::kMaxLoraTypes ? Config.loraTypes.size() : TB::kMaxLoraTypes;
@@ -125,18 +128,42 @@ namespace {
     // that were never touched keep their exact stored form, even when they are longer than the app's buffers, and
     // everything the app may not change (secrets, Mic-E, status text ...) is never touched at all.
     void applySettings(const TB::EditableSettings& staged, const TB::EditableSettings& base, Configuration& c) {
-        for (size_t i = 0; i < staged.beaconCount && i < base.beaconCount && i < c.beacons.size(); i++) {
-            const TB::EditableBeacon& s = staged.beacons[i];
-            const TB::EditableBeacon& o = base.beacons[i];
-            Beacon& b = c.beacons[i];
-            if (differs(s.callsign, o.callsign)) b.callsign = s.callsign;
-            if (differs(s.symbol, o.symbol)) b.symbol = s.symbol;
-            if (differs(s.overlay, o.overlay)) b.overlay = s.overlay;
-            if (differs(s.comment, o.comment)) b.comment = s.comment;
-            if (differs(s.label, o.label)) b.profileLabel = s.label;
-            if (s.smartBeacon != o.smartBeacon) b.smartBeaconActive = s.smartBeacon;
-            if (s.smartSetting != o.smartSetting) b.smartBeaconSetting = static_cast<byte>(s.smartSetting);
-            if (s.gpsEco != o.gpsEco) b.gpsEcoMode = s.gpsEco;
+        // Profiles can have been added or removed: build the new list from each staged profile's origin.
+        if (staged.beaconCount >= 1) {
+            const std::vector<Beacon> saved = c.beacons;
+            std::vector<Beacon> next;
+            for (size_t i = 0; i < staged.beaconCount; i++) {
+                const TB::EditableBeacon& s = staged.beacons[i];
+                const bool kept = s.origin >= 0 && static_cast<size_t>(s.origin) < saved.size() && static_cast<size_t>(s.origin) < base.beaconCount;
+                Beacon b;
+                if (kept) {
+                    b = saved[s.origin];    // keeps everything the app cannot see (Mic-E, status, long texts)
+                    const TB::EditableBeacon& o = base.beacons[s.origin];
+                    if (differs(s.callsign, o.callsign)) b.callsign = s.callsign;
+                    if (differs(s.symbol, o.symbol)) b.symbol = s.symbol;
+                    if (differs(s.overlay, o.overlay)) b.overlay = s.overlay;
+                    if (differs(s.comment, o.comment)) b.comment = s.comment;
+                    if (differs(s.label, o.label)) b.profileLabel = s.label;
+                    if (s.smartBeacon != o.smartBeacon) b.smartBeaconActive = s.smartBeacon;
+                    if (s.smartSetting != o.smartSetting) b.smartBeaconSetting = static_cast<byte>(s.smartSetting);
+                    if (s.gpsEco != o.gpsEco) b.gpsEcoMode = s.gpsEco;
+                } else {
+                    b.callsign = s.callsign;
+                    b.symbol = s.symbol;
+                    b.overlay = s.overlay;
+                    b.micE = "";
+                    b.comment = s.comment;
+                    b.profileLabel = s.label;
+                    b.status = "";
+                    b.smartBeaconActive = s.smartBeacon;
+                    b.smartBeaconSetting = static_cast<byte>(s.smartSetting);
+                    b.gpsEcoMode = s.gpsEco;
+                }
+                next.push_back(b);
+            }
+            // profiles beyond what the app can show are never touched
+            for (size_t i = TB::kMaxBeacons; i < saved.size(); i++) next.push_back(saved[i]);
+            c.beacons = next;
         }
         if (differs(staged.path, base.path)) c.path = staged.path;
         for (size_t i = 0; i < staged.loraCount && i < base.loraCount && i < c.loraTypes.size(); i++) {
@@ -229,7 +256,12 @@ namespace {
                 copy.bluetooth.active = true;
                 copy.bluetooth.useBLE = true;
             #endif
+            bool profilesMoved = controller.staged().beaconCount != base.beaconCount;
+            for (size_t i = 0; i < controller.staged().beaconCount; i++) {
+                if (controller.staged().beacons[i].origin != static_cast<int>(i)) profilesMoved = true;
+            }
             if (saveChecked(copy)) {
+                if (profilesMoved) STATION_Utils::saveIndex(0, 0);    // the remembered active profile may no longer exist
                 restartPlanned = true;
                 restartAtMs = now + TB_RESTART_DELAY_MS;
             } else {

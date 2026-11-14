@@ -121,6 +121,12 @@ def main():
     first = (names.get("config_overflow_degrades", {}).get("b") or [{}])[0]
     expect(first.get("cc") == 1, "config_overflow: a cut comment must be flagged with cc")
     expect(all("cc" not in x for x in names.get("config_normal", {}).get("b", [])), "config_normal: short comments must not be flagged")
+    five = names.get("beacons_five_short", {})
+    expect(five.get("n") == 5 and len(five.get("b", [])) == 5 and five["b"][0].get("cm") == "short" and "cc" not in five["b"][0], "beacons: five short profiles in full")
+    long5 = names.get("beacons_five_long", {})
+    expect(len(long5.get("b", [])) == 5 and all(x.get("cc") == 1 for x in long5.get("b", [])), "beacons: five long comments are all there, cut and flagged")
+    expect(len(names.get("beacons_too_many", {}).get("b", [])) == 5, "beacons: never more than five")
+    expect(names.get("beacons_none", {}).get("b") == [], "beacons: none")
     msgs = names.get("messages_normal", {})
     expect(msgs.get("n") == 6 and 1 <= len(msgs.get("m", [])) <= 6, "messages_normal: wrong counts")
     expect(msgs.get("m", [{}])[0].get("f") == "SP9AAA-7", "messages_normal: newest must be first")

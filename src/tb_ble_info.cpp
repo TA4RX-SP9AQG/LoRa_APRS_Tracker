@@ -36,6 +36,7 @@
 #define TB_SERVICE_UUID   "00000010-ba2a-46c9-ae49-01b0961f68bb"
 #define TB_INFO_UUID      "00000011-ba2a-46c9-ae49-01b0961f68bb"
 #define TB_CONFIG_UUID    "00000012-ba2a-46c9-ae49-01b0961f68bb"
+#define TB_BEACONS_UUID   "00000016-ba2a-46c9-ae49-01b0961f68bb"
 #define TB_MESSAGES_UUID  "00000013-ba2a-46c9-ae49-01b0961f68bb"
 
 #define TB_FIRMWARE_VERSION  "4.0.1-tb1"
@@ -63,6 +64,7 @@ namespace {
 
     NimBLECharacteristic*   infoChr         = nullptr;
     NimBLECharacteristic*   configChr       = nullptr;
+    NimBLECharacteristic*   beaconsChr      = nullptr;
     NimBLECharacteristic*   messagesChr     = nullptr;
 
     uint32_t                lastRefreshMs   = 0;
@@ -73,6 +75,8 @@ namespace {
     char                    configBuf[TB::kMaxPayload + 4];
     char                    messagesBuf[TB::kMaxPayload + 4];
     char                    configLast[TB::kMaxPayload + 4] = "";
+    char                    beaconsBuf[TB::kMaxPayload + 4];
+    char                    beaconsLast[TB::kMaxPayload + 4] = "";
 
     const char* boardName() {
         #ifdef HELTEC_WIRELESS_TRACKER
@@ -150,6 +154,11 @@ namespace {
             beacons[i].smartBeacon = b.smartBeaconActive;
             beacons[i].smartSetting = b.smartBeaconSetting;
             beacons[i].gpsEco = b.gpsEcoMode;
+        }
+        const size_t bn = TB::buildBeacons(beacons, nb, beaconsBuf, TB::kMaxPayload);
+        if (bn > 0 && strcmp(beaconsBuf, beaconsLast) != 0) {
+            publish(beaconsChr, beaconsBuf, bn);
+            strcpy(beaconsLast, beaconsBuf);
         }
         TB::LoraData lora[TB::kMaxLoraTypes] = {};
         size_t nl = Config.loraTypes.size() < TB::kMaxLoraTypes ? Config.loraTypes.size() : TB::kMaxLoraTypes;
@@ -236,6 +245,7 @@ namespace TB_BLE {
         if (!service) return;
         infoChr     = service->createCharacteristic(TB_INFO_UUID, NIMBLE_PROPERTY::READ);
         configChr   = service->createCharacteristic(TB_CONFIG_UUID, NIMBLE_PROPERTY::READ);
+        beaconsChr  = service->createCharacteristic(TB_BEACONS_UUID, NIMBLE_PROPERTY::READ);
         messagesChr = service->createCharacteristic(TB_MESSAGES_UUID, NIMBLE_PROPERTY::READ);
         TB_BLE_CONTROL::setup(service);    // change settings from the app (needs the PIN shown on the tracker)
         service->start();
@@ -243,6 +253,7 @@ namespace TB_BLE {
         static const uint8_t zeros[TB::kMaxPayload] = {0};
         infoChr->setValue(zeros, sizeof(zeros));
         configChr->setValue(zeros, sizeof(zeros));
+        beaconsChr->setValue(zeros, sizeof(zeros));
         messagesChr->setValue(zeros, sizeof(zeros));
         publishInfo();
         publishConfig();

@@ -30,6 +30,8 @@ static TB::EditableSettings sample() {
     std::strcpy(s.beacons[1].callsign, "NOCALL-8");
     std::strcpy(s.beacons[1].symbol, ">");
     std::strcpy(s.beacons[1].overlay, "/");
+    s.beacons[0].origin = 0;
+    s.beacons[1].origin = 1;
     std::strcpy(s.path, "WIDE1-1");
     s.loraCount = 1;
     s.lora[0] = {433775000, 12, 125000, 5, 20};
@@ -503,6 +505,51 @@ int main() {
             t.signIn();
             CHECK(is(t.send(j), false, "invalid"), "a bad tnc value is refused");
         }
+    }
+
+    // ---- adding and removing beacon profiles ----
+    {
+        Rig t;
+        t.signIn();
+        CHECK(t.send("{\"id\":3,\"op\":\"set\",\"badd\":1}").ok, "a profile can be added");
+        CHECK(t.c.staged().beaconCount == 3, "now three profiles");
+        CHECK(t.c.staged().beacons[2].origin == -1, "the new one has no origin");
+        CHECK(std::strcmp(t.c.staged().beacons[2].callsign, "NOCALL-7") == 0 && std::strcmp(t.c.staged().beacons[2].symbol, "[") == 0 &&
+                  t.c.staged().beacons[2].smartBeacon,
+              "the new profile starts with the first profile's callsign and defaults");
+        CHECK(t.send("{\"id\":4,\"op\":\"set\",\"b\":{\"i\":2,\"cs\":\"SP9AQG-7\",\"sym\":\"b\",\"cm\":\"bike\"}}").ok, "the new profile can be edited");
+        CHECK(std::strcmp(t.c.staged().beacons[2].callsign, "SP9AQG-7") == 0, "edit staged");
+        CHECK(t.send("{\"id\":5,\"op\":\"set\",\"badd\":1}").ok && t.send("{\"id\":6,\"op\":\"set\",\"badd\":1}").ok, "up to five profiles");
+        CHECK(t.c.staged().beaconCount == TB::kMaxBeacons, "five profiles");
+        CHECK(is(t.send("{\"id\":7,\"op\":\"set\",\"badd\":1}"), false, "invalid"), "a sixth profile is refused");
+        CHECK(t.c.staged().beaconCount == TB::kMaxBeacons, "still five");
+    }
+    {
+        Rig t;
+        t.signIn();
+        CHECK(t.send("{\"id\":3,\"op\":\"set\",\"bdel\":0}").ok, "a profile can be removed");
+        CHECK(t.c.staged().beaconCount == 1, "one profile left");
+        CHECK(std::strcmp(t.c.staged().beacons[0].callsign, "NOCALL-8") == 0 && t.c.staged().beacons[0].origin == 1,
+              "the remaining profile moved up and remembers where it came from");
+        CHECK(is(t.send("{\"id\":4,\"op\":\"set\",\"bdel\":0}"), false, "invalid"), "the last profile cannot be removed");
+        CHECK(t.c.staged().beaconCount == 1, "still one");
+        CHECK(std::strcmp(t.current.beacons[0].callsign, "NOCALL-7") == 0 && t.current.beaconCount == 2, "the live settings are untouched");
+    }
+    {
+        const char* bad[] = {"{\"id\":3,\"op\":\"set\",\"bdel\":2}", "{\"id\":3,\"op\":\"set\",\"bdel\":-1}", "{\"id\":3,\"op\":\"set\",\"bdel\":\"0\"}",
+                             "{\"id\":3,\"op\":\"set\",\"badd\":2}", "{\"id\":3,\"op\":\"set\",\"badd\":true}", "{\"id\":3,\"op\":\"set\",\"badd\":0}"};
+        for (const char* j : bad) {
+            Rig t;
+            t.signIn();
+            TB::CommandResult x = t.send(j);
+            gChecks++;
+            if (!is(x, false, "invalid") || (t.c.hasStaged() && t.c.staged().beaconCount != 2)) {
+                gFailures++;
+                std::printf("FAIL\tshould be rejected without effect: %s\n", j);
+            }
+        }
+        Rig u;
+        CHECK(is(u.send("{\"id\":3,\"op\":\"set\",\"badd\":1}"), false, "not_authed"), "adding a profile needs the PIN");
     }
 
     // ---- individual validators ----

@@ -293,6 +293,23 @@ struct Detail {
     size_t loras;
 };
 
+void writeBeacon(Writer& w, const BeaconData& b, size_t commentChars, size_t labelChars) {
+    w.beginObject();
+    w.key("cs");  w.str(b.callsign, 16);
+    w.key("sym"); w.str(b.symbol, 2);
+    w.key("ov");  w.str(b.overlay, 2);
+    w.key("sb");  w.boolean(b.smartBeacon);
+    w.key("sbs"); w.integer(b.smartSetting);
+    w.key("eco"); w.boolean(b.gpsEco);
+    if (commentChars > 0) { w.key("cm"); w.str(b.comment, commentChars); }
+    if (labelChars > 0) { w.key("lbl"); w.str(b.label, labelChars); }
+    // "cc" / "lc": the comment / label is longer than what is shown here (cut or left out), so the app must not
+    // present the shown text as the whole value
+    if (b.comment && strlen(b.comment) > commentChars) { w.key("cc"); w.boolean(true); }
+    if (b.label && strlen(b.label) > labelChars) { w.key("lc"); w.boolean(true); }
+    w.endObject();
+}
+
 size_t tryConfig(const ConfigData& c, const Detail& detail, char* out, size_t cap) {
     Writer w(out, cap);
     w.beginObject();
@@ -301,21 +318,7 @@ size_t tryConfig(const ConfigData& c, const Detail& detail, char* out, size_t ca
     w.beginArray();
     const size_t nb = c.beacons ? (c.beaconCount < detail.beacons ? c.beaconCount : detail.beacons) : 0;
     for (size_t i = 0; i < nb; i++) {
-        const BeaconData& b = c.beacons[i];
-        w.beginObject();
-        w.key("cs");  w.str(b.callsign, 16);
-        w.key("sym"); w.str(b.symbol, 2);
-        w.key("ov");  w.str(b.overlay, 2);
-        w.key("sb");  w.boolean(b.smartBeacon);
-        w.key("sbs"); w.integer(b.smartSetting);
-        w.key("eco"); w.boolean(b.gpsEco);
-        if (detail.commentChars > 0) { w.key("cm"); w.str(b.comment, detail.commentChars); }
-        if (detail.labelChars > 0) { w.key("lbl"); w.str(b.label, detail.labelChars); }
-        // "cc" / "lc": the comment / label is longer than what is shown here (cut or left out), so the app must not
-        // present the shown text as the whole value
-        if (b.comment && strlen(b.comment) > detail.commentChars) { w.key("cc"); w.boolean(true); }
-        if (b.label && strlen(b.label) > detail.labelChars) { w.key("lc"); w.boolean(true); }
-        w.endObject();
+        writeBeacon(w, c.beacons[i], detail.commentChars, detail.labelChars);
     }
     w.endArray();
     w.key("path"); w.str(c.path, 40);
@@ -372,6 +375,25 @@ size_t buildConfig(const ConfigData& c, char* out, size_t cap) {
     for (size_t i = 0; i < sizeof(tiers) / sizeof(tiers[0]); i++) {
         const size_t n = tryConfig(c, tiers[i], out, cap);
         if (n > 0) return n;
+    }
+    if (cap > 0) out[0] = '\0';
+    return 0;
+}
+
+size_t buildBeacons(const BeaconData* beacons, size_t count, char* out, size_t cap) {
+    const size_t n = beacons ? (count < kMaxBeacons ? count : kMaxBeacons) : 0;
+    const size_t tiers[][2] = {{60, 20}, {24, 12}, {8, 0}, {0, 0}};    // comment, label characters
+    for (size_t t = 0; t < sizeof(tiers) / sizeof(tiers[0]); t++) {
+        Writer w(out, cap);
+        w.beginObject();
+        w.key("v"); w.integer(kProtocolVersion);
+        w.key("n"); w.integer(static_cast<long long>(n));
+        w.key("b");
+        w.beginArray();
+        for (size_t i = 0; i < n; i++) writeBeacon(w, beacons[i], tiers[t][0], tiers[t][1]);
+        w.endArray();
+        w.endObject();
+        if (w.ok()) return w.size();
     }
     if (cap > 0) out[0] = '\0';
     return 0;

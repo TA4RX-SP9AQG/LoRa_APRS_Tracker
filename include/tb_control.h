@@ -81,6 +81,7 @@ struct EditableBeacon {
     bool smartBeacon;
     int  smartSetting;
     bool gpsEco;
+    int  origin;    // index of this profile in the saved settings; -1 for one added in this session
 };
 
 struct EditableLora {

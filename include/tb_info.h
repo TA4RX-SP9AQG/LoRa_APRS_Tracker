@@ -135,6 +135,8 @@ size_t buildCommandResult(const CommandResult& result, char* out, size_t cap);
 // length, or 0 when even the smallest form does not fit. They never write outside [out].
 size_t buildInfo(const InfoData& data, char* out, size_t cap);
 size_t buildConfig(const ConfigData& data, char* out, size_t cap);
+// All beacon profiles (up to kMaxBeacons) with as much of the comment and label as fits.
+size_t buildBeacons(const BeaconData* beacons, size_t count, char* out, size_t cap);
 // [newestFirst] holds [count] messages; as many as fit are written, whole messages only. [total] is the number
 // of messages stored on the tracker.
 size_t buildMessages(const MessageData* newestFirst, size_t count, int total, char* out, size_t cap);
