@@ -40,7 +40,7 @@
 #define TB_BEACONS_UUID   "00000016-ba2a-46c9-ae49-01b0961f68bb"
 #define TB_MESSAGES_UUID  "00000013-ba2a-46c9-ae49-01b0961f68bb"
 
-#define TB_FIRMWARE_VERSION  "4.0.1-tb1"
+#define TB_FIRMWARE_VERSION  "4.0.1-tb2"
 #define TB_REFRESH_MS        3000
 #define TB_MESSAGES_FILE     "/aprsMessages.txt"
 #define TB_MESSAGES_TAIL     1600     // bytes read from the end of the file
