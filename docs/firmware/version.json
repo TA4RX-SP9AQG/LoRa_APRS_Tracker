@@ -1,5 +1,6 @@
 {
   "version": "4.0.1-tb1",
+  "source_commit": "c74f114c4421f300fc3e15b351fd6d0616470c55",
   "built": "2026-11-14",
   "tested_on_hardware": false,
   "files": {
