@@ -1,6 +1,6 @@
 {
   "name": "TrackBridge firmware (English)",
-  "version": "4.0.1-tb1",
+  "version": "4.0.1-tb2",
   "new_install_prompt_erase": true,
   "builds": [
     {
