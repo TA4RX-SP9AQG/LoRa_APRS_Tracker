@@ -17,6 +17,7 @@
  */
 
 #include <RadioLib.h>
+#include "tb_radio.h"
 #include <logger.h>
 #include <SPI.h>
 #include "notification_utils.h"
@@ -119,13 +120,7 @@ namespace LoRa_Utils {
             radio.setPaRampTime(RADIOLIB_SX126X_PA_RAMP_800U);  // after setPower(): setOutputPower() resets the PA ramp time
         #endif
 
-        String loraCountryFreq;
-        switch (loraIndex) {
-            case 0: loraCountryFreq = "EU/WORLD"; break;
-            case 1: loraCountryFreq = "POLAND"; break;
-            case 2: loraCountryFreq = "UK"; break;
-            case 3: loraCountryFreq = "US"; break;
-        }
+        const String loraCountryFreq = tbRadioName(*currentLoRaType, nullptr, 9);    // TrackBridge: follows the real values, not the position
         String currentLoRainfo = "LoRa ";
         currentLoRainfo += loraCountryFreq;
         currentLoRainfo += " / Freq: ";

@@ -38,6 +38,7 @@
 extern Configuration Config;
 extern bool          displayState;
 extern bool          bluetoothConnected;
+extern uint8_t       loraIndex;
 extern uint32_t      displayTime;
 
 namespace {
@@ -118,6 +119,7 @@ namespace {
         strlcpy(s.btName, Config.bluetooth.deviceName.c_str(), sizeof(s.btName));
         s.telemetry = Config.telemetry.active;
         s.tncMode = Config.tncMode;
+        s.radioIndex = loraIndex;
     }
 
     bool differs(const char* a, const char* b) {
@@ -261,6 +263,7 @@ namespace {
                 if (controller.staged().beacons[i].origin != static_cast<int>(i)) profilesMoved = true;
             }
             if (saveChecked(copy)) {
+                if (controller.staged().radioSet && controller.staged().radioIndex != base.radioIndex) STATION_Utils::saveIndex(1, static_cast<uint8_t>(controller.staged().radioIndex));    // the active radio profile, read at start
                 if (profilesMoved) STATION_Utils::saveIndex(0, 0);    // the remembered active profile may no longer exist
                 restartPlanned = true;
                 restartAtMs = now + TB_RESTART_DELAY_MS;

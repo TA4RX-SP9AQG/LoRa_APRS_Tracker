@@ -17,6 +17,7 @@
  */
 
 #include <logger.h>
+#include "tb_radio.h"
 #include <Wire.h>
 #include "custom_characters.h"
 #include "custom_colors.h"
@@ -563,12 +564,9 @@ void displayShow(const String& header, const String& line1, const String& line2,
 
 void startupScreen(uint8_t index, const String& version) {
     String workingFreq = "    LoRa Freq [";
-    switch (index) {
-        case 0: workingFreq += "EU]"; break;
-        case 1: workingFreq += "PL]"; break;
-        case 2: workingFreq += "UK]"; break;
-        case 3: workingFreq += "US]"; break;
-    }
+    // TrackBridge: the name follows the real values of the profile, not its position in the list
+    if (index < Config.loraTypes.size()) workingFreq += tbRadioName(Config.loraTypes[index], nullptr, 5);
+    workingFreq += "]";
     displayShow(" LoRa APRS", "      (TRACKER)", workingFreq, "", "", "  CA2RXU  " + version, 4000);
     logger.log(logging::LoggerLevel::LOGGER_LEVEL_INFO, "Main", "RichonGuzman (CA2RXU) --> LoRa APRS Tracker/Station");
     logger.log(logging::LoggerLevel::LOGGER_LEVEL_INFO, "Main", "Version: %s", version);

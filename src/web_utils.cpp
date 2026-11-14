@@ -132,7 +132,8 @@ namespace WEB_Utils {
         };
 
         //  Beacons
-        for (int i = 0; i < 3; i++) {
+        for (size_t i = 0; i < Config.beacons.size(); i++) {    // TrackBridge: the number of profiles is not always 3 (the app can add and remove them)
+            if (!request->hasParam("beacons." + String(i) + ".callsign", true)) continue;
             Config.beacons[i].callsign      = request->getParam("beacons." + String(i) + ".callsign", true)->value();
             Config.beacons[i].symbol        = request->getParam("beacons." + String(i) + ".symbol", true)->value();
             Config.beacons[i].overlay       = request->getParam("beacons." + String(i) + ".overlay", true)->value();
@@ -199,7 +200,7 @@ namespace WEB_Utils {
         }
 
         // LORA
-        for (int i = 0; i < 4; i++) {
+        for (size_t i = 0; i < Config.loraTypes.size(); i++) {
             Config.loraTypes[i].frequency       = getParamDoubleSafe("lora." + String(i) + ".frequency", Config.loraTypes[i].frequency);
             Config.loraTypes[i].spreadingFactor = getParamIntSafe("lora." + String(i) + ".spreadingFactor", Config.loraTypes[i].spreadingFactor);
             Config.loraTypes[i].codingRate4     = getParamIntSafe("lora." + String(i) + ".codingRate4", Config.loraTypes[i].codingRate4);

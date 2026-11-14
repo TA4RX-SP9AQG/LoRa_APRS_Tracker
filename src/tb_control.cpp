@@ -289,6 +289,9 @@ bool applyAll(JsonObjectConst cmd, EditableSettings& s, char* bad, bool& any) {
             if (s.beaconCount <= 1 || !readInt(v, 0, static_cast<long>(s.beaconCount) - 1, index)) { setField(bad, nullptr, k); return false; }
             for (size_t j = static_cast<size_t>(index); j + 1 < s.beaconCount; j++) s.beacons[j] = s.beacons[j + 1];
             s.beaconCount--;
+        } else if (!strcmp(k, "ri")) {
+            if (!readIntAsInt(v, 0, static_cast<long>(s.loraCount) - 1, s.radioIndex)) { setField(bad, nullptr, k); return false; }
+            s.radioSet = true;
         } else if (!strcmp(k, "tnc")) {
             if (!readIntAsInt(v, 0, 3, s.tncMode)) { setField(bad, nullptr, k); return false; }
         } else {

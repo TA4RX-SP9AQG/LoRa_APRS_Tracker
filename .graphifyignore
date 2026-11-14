@@ -1,0 +1,6 @@
+docs/vendor/
+docs/firmware/
+tools/tb_test/*.exe
+tools/tb_test/*.pdb
+data_embed/bootstrap.js
+data_embed/bootstrap.css

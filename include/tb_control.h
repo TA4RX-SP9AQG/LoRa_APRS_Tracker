@@ -115,6 +115,8 @@ struct EditableSettings {
     char           btName[kBtNameLen];
     bool           telemetry;
     int            tncMode;
+    int            radioIndex;    // active radio profile
+    bool           radioSet;      // the app asked for a change of it in this session
 };
 
 // What the glue code has to do after a command.

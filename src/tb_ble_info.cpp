@@ -18,6 +18,7 @@
  */
 
 #include <NimBLEDevice.h>
+#include "tb_radio.h"
 #include <SPIFFS.h>
 #include <TinyGPS++.h>
 #include <deque>
@@ -51,6 +52,7 @@ extern bool             gpsIsActive;
 extern bool             bluetoothConnected;
 extern Beacon*          currentBeacon;
 extern uint8_t          myBeaconsIndex;
+extern uint8_t          loraIndex;
 extern LoraType*        currentLoRaType;
 extern bool             smartBeaconActive;
 extern uint32_t         lastTxTime;
@@ -139,6 +141,7 @@ namespace {
         d.storedMessages = MSG_Utils::getNumAPRSMessages();
         d.freeHeap = ESP.getFreeHeap();
         d.tncMode = Config.tncMode;
+        d.radioIndex = loraIndex;
         d.tncEffective = TB_BLE_CONTROL::tncEffective();
         publish(infoChr, infoBuf, TB::buildInfo(d, infoBuf, TB::kMaxPayload));
     }

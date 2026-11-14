@@ -328,6 +328,9 @@ namespace STATION_Utils {
             while (fileIndex.available()) {
                 String firstLine = fileIndex.readStringUntil('\n');
                 int index = firstLine.toInt();
+                // TrackBridge: a saved number outside the list (a removed profile) would read past the list and crash
+                if (type == 0 && (index < 0 || index >= (int)Config.beacons.size())) index = 0;
+                if (type == 1 && (index < 0 || index >= (int)Config.loraTypes.size())) index = 0;
                 String logMessage;
                 if (type == 0) {
                     myBeaconsIndex = index;
@@ -339,7 +342,7 @@ namespace STATION_Utils {
                     screenBrightness = index;
                     logMessage = "Brightness:";
                 }
-                logger.log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, "Main", "%s %s", logMessage.c_str(), firstLine);
+                logger.log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, "Main", "%s %d", logMessage.c_str(), index);
             }
             fileIndex.close();
         }

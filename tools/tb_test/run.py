@@ -58,6 +58,11 @@ def main():
     raw += tnc_run.stdout
     if tnc_run.returncode not in (0, 1) or b"SUMMARY" not in tnc_run.stdout:
         sys.exit("tnc test crashed (exit code %s): %s" % (tnc_run.returncode, tnc_run.stderr.decode("utf-8", "replace")[-400:]))
+    radio = build("test_tb_radio.cpp", ["tb_radio.cpp"], "tb_radio_test.exe")
+    radio_run = subprocess.run([str(radio)], capture_output=True)
+    raw += radio_run.stdout
+    if radio_run.returncode not in (0, 1) or b"SUMMARY" not in radio_run.stdout:
+        sys.exit("radio test crashed (exit code %s)" % radio_run.returncode)
     cases = 0
     failures = []
     names = {}
@@ -112,6 +117,7 @@ def main():
     expect(info.get("bat", {}).get("p") == 87 and info.get("gps", {}).get("sat") == 9, "info_normal: wrong values")
     expect(info.get("up") == 4000000000, "info_normal: uptime not preserved as unsigned")
     expect(info.get("tnc") == {"m": 3, "e": 1}, "info_normal: TNC mode (set and in effect) missing")
+    expect(info.get("ri") == 1, "info_normal: active radio profile missing")
     nb = names.get("info_no_battery_no_fix", {})
     expect(nb.get("bat") is None or nb["bat"].get("p") is None, "info_no_battery: battery should be absent/unknown")
     expect(nb.get("gps", {}).get("fix") == 0, "info_no_battery: fix should be 0")

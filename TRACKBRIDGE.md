@@ -55,6 +55,16 @@ Characteristic `...0016` (READ) lists every beacon profile (up to 5), with as mu
 removed) change the list. On commit the new list is built from each profile's origin, so Mic-E, status text and long texts of kept
 profiles survive, and the remembered active profile is reset to the first one when profiles moved.
 
+### Radio names on the tracker's screen
+
+The stock firmware printed a fixed country name per radio profile *position* (first = EU, second = PL, third = UK, fourth = US) on
+the boot screen, the main screen, the Change Frequency menu and after switching profile, so a profile changed from the app kept
+its old name. `src/tb_radio.cpp` (PC-tested) now names a profile from its real values: 433.775 MHz SF12 CR4/5 = EU (TR in the
+Turkish build: Europe and Turkey share these numbers), 434.855 MHz SF9 CR4/7 = PL, 439.9125 MHz SF12 CR4/5 = UK, 915 MHz SF12
+CR4/5 = US (all 125 kHz); anything else is shown as its frequency. The status JSON reports the active radio profile (`"ri"`) and
+the control key `"ri"` chooses it (saved on commit, like the menu does). Also fixed on the way: a saved profile number outside
+the list is ignored instead of read past the end, and the web page's save follows the real number of beacon and radio profiles.
+
 ### TNC modes
 
 Setting `bluetooth.tncMode` (control key `"tnc"`, reported in the status JSON as `"tnc":{"m":set,"e":in effect}`). It decides

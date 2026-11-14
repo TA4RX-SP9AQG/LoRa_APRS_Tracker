@@ -33,7 +33,7 @@ namespace TB {
 constexpr int    kProtocolVersion = 1;
 constexpr size_t kMaxPayload      = 500;   // bytes incl. terminator must stay below the 512 byte BLE attribute limit
 constexpr size_t kMaxBeacons      = 5;
-constexpr size_t kMaxLoraTypes    = 3;
+constexpr size_t kMaxLoraTypes    = 4;
 
 struct InfoData {
     const char* firmware;
@@ -63,6 +63,7 @@ struct InfoData {
     int         storedMessages;
     uint32_t    freeHeap;
     int         tncMode;            // as set (see tb_tnc.h)
+    int         radioIndex;         // active radio profile
     int         tncEffective;       // in effect right now
 };
 

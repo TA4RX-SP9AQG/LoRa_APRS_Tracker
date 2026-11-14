@@ -552,6 +552,21 @@ int main() {
         CHECK(is(u.send("{\"id\":3,\"op\":\"set\",\"badd\":1}"), false, "not_authed"), "adding a profile needs the PIN");
     }
 
+    // ---- active radio profile ----
+    {
+        Rig t; t.signIn();
+        CHECK(t.send("{\"id\":3,\"op\":\"set\",\"ri\":0}").ok && t.c.staged().radioIndex == 0, "ri 0 is accepted");
+        for (const char* j : {"{\"id\":3,\"op\":\"set\",\"ri\":1}", "{\"id\":3,\"op\":\"set\",\"ri\":-1}", "{\"id\":3,\"op\":\"set\",\"ri\":\"0\"}", "{\"id\":3,\"op\":\"set\",\"ri\":0.5}"}) {
+            Rig u; u.signIn();
+            CHECK(is(u.send(j), false, "invalid"), "an unknown radio profile is refused");
+        }
+        Rig w; w.current.loraCount = 3; w.signIn();
+        CHECK(w.send("{\"id\":3,\"op\":\"set\",\"ri\":2}").ok && w.c.staged().radioIndex == 2, "the third profile can be made active when there are three");
+        CHECK(w.c.staged().radioSet, "a deliberate choice is marked");
+        Rig n2; n2.signIn(); n2.send("{\"id\":3,\"op\":\"set\",\"path\":\"WIDE1-1\"}");
+        CHECK(!n2.c.staged().radioSet, "another change does not mark the radio profile as chosen");
+    }
+
     // ---- individual validators ----
     CHECK(TB::validCallsign("SP9AQG-9") && TB::validCallsign("TA4RX-7") && TB::validCallsign("N0CALL") && TB::validCallsign("SP9AQG-15"),
           "good callsigns");

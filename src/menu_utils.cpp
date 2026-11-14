@@ -17,6 +17,7 @@
  */
 
 #include <APRSPacketLib.h>
+#include "tb_radio.h"
 #include "tb_lang.h"
 #include "tb_ble_control.h"
 #include <TinyGPS++.h>
@@ -44,6 +45,7 @@ extern std::vector<String>  loadedAPRSMessages;
 extern std::vector<String>  loadedWLNKMails;
 extern int                  messagesIterator;
 extern uint8_t              loraIndex;
+extern LoraType            *currentLoRaType;
 extern uint32_t             menuTime;
 extern bool                 symbolAvailable;
 extern bool                 keyDetected;
@@ -386,11 +388,18 @@ namespace MENU_Utils {
                 break;
 
             case 210:   // 2.Configuration ---> Change Frequency
-                switch (loraIndex) {
-                    case 0: freqChangeWarning = "      EU --> PL"; break;
-                    case 1: freqChangeWarning = "      PL --> UK"; break;
-                    case 2: freqChangeWarning = "      UK --> US"; break;
-                    case 3: freqChangeWarning = "      US --> EU"; break;
+                {   // TrackBridge: names follow the real values of the current and the next radio profile
+                    const size_t tbCount = Config.loraTypes.size();
+                    const size_t tbCur = loraIndex < tbCount ? loraIndex : 0;
+                    if (tbCount == 0) {
+                        freqChangeWarning = "";
+                    } else {
+                        const size_t tbNext = (tbCur + 1) % tbCount;
+                        const String tbText = tbRadioName(Config.loraTypes[tbCur], nullptr, 7) + " --> " + tbRadioName(Config.loraTypes[tbNext], nullptr, 7);
+                        freqChangeWarning = "";
+                        for (int tbPad = (21 - (int)tbText.length()) / 2; tbPad > 0; tbPad--) freqChangeWarning += " ";
+                        freqChangeWarning += tbText;
+                    }
                 }
                 displayShow(TB_T("LORA FREQ>", "LORA FREK.>"), "",TB_T("   Confirm Change?", "   Degisiklik onay?"), freqChangeWarning, "", TB_T("<Back         Select>", "<Geri         Sec>   "));
                 break;
@@ -748,12 +757,10 @@ namespace MENU_Utils {
                         }
                     } else {
                         thirdRowMainMenu = String(Utils::getMaidenheadLocator(gps.location.lat(), gps.location.lng(), 8));
-                        thirdRowMainMenu += " LoRa[";
-                        switch (loraIndex) {
-                            case 0: thirdRowMainMenu += "Eu]"; break;
-                            case 1: thirdRowMainMenu += "PL]"; break;
-                            case 2: thirdRowMainMenu += "UK]"; break;
-                            case 3: thirdRowMainMenu += "US]"; break;
+                        {   // TrackBridge: a known setting by its country code, any other by its frequency (the row is short)
+                            bool tbKnown = false;
+                            const String tbName = tbRadioName(*currentLoRaType, &tbKnown, 5);
+                            thirdRowMainMenu += tbKnown ? " LoRa[" + tbName + "]" : " " + tbName;
                         }
                     }
 
