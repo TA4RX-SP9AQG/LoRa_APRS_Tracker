@@ -116,12 +116,15 @@ namespace {
         #endif
 
         d.gpsEnabled = gpsIsActive && !Config.disableGPS;
-        d.gpsFix = gps.location.isValid();
-        d.satellites = gps.satellites.isValid() ? (int)gps.satellites.value() : 0;
-        d.hdop = gps.hdop.isValid() ? (float)gps.hdop.hdop() : 0.0f;
-        d.speedKmh = gps.speed.isValid() ? (float)gps.speed.kmph() : 0.0f;
-        d.altitudeM = gps.altitude.isValid() ? (int)gps.altitude.meters() : 0;
+        // TinyGPS++ keeps location.isValid() true for ever after the first fix, even when the signal is lost. A fix only
+        // counts while the position is being updated: a receiver with a fix reports at least every few seconds.
         const uint32_t gpsAgeMs = gps.location.age();
+        const bool gpsFresh = gps.location.isValid() && gpsAgeMs != 0xFFFFFFFFu && gpsAgeMs < 10000u;
+        d.gpsFix = gpsFresh;
+        d.satellites = gps.satellites.isValid() ? (int)gps.satellites.value() : 0;
+        d.hdop = gpsFresh && gps.hdop.isValid() ? (float)gps.hdop.hdop() : 0.0f;
+        d.speedKmh = gpsFresh && gps.speed.isValid() ? (float)gps.speed.kmph() : 0.0f;
+        d.altitudeM = gpsFresh && gps.altitude.isValid() ? (int)gps.altitude.meters() : 0;
         d.gpsAgeS = (gpsAgeMs == 0xFFFFFFFFu || !gps.location.isValid()) ? -1 : (int32_t)(gpsAgeMs / 1000);
         d.lastTxAgoS = lastTxTime == 0 ? -1 : (int32_t)((millis() - lastTxTime) / 1000);
         d.smartBeacon = smartBeaconActive;
