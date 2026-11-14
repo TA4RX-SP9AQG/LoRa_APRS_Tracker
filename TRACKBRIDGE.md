@@ -101,6 +101,12 @@ settings, characteristic flags, callbacks), `src/tb_ble_control.cpp` (code gener
 try again; if the setting must be undone without a connection, flash with "Erase device". The iOS aprs.fi app and other
 generic BLE KISS clients do not support passkey pairing from this firmware's point of view as tested; leave the option off for them.
 
+### Simplified tracker mode and the screen
+
+In the stock firmware "simplified tracker mode" switches the button off, so a screen that went to sleep (display eco mode) could not be
+woken again. In this edition the button still wakes the screen in that mode (it does nothing else). Menus and the other button
+functions stay off, as in the original.
+
 ### Known limits
 
 * **The KISS characteristic has no authentication unless the Secure link option is switched on** (as in the original firmware):

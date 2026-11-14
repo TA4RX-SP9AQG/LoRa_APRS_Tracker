@@ -30,6 +30,7 @@
     extern int              menuDisplay;
     extern uint32_t         displayTime;
     extern uint32_t         menuTime;
+    extern bool             displayState;
 
     namespace BUTTON_Utils {
 
@@ -59,6 +60,16 @@
                 KEYBOARD_Utils::leftArrow();
             }
         #endif
+
+        // Simplified tracker mode has no menu, but the button must still wake a screen that went to sleep (display
+        // eco mode); without this the screen could never be switched on again.
+        void wakeOnly() {
+            if (!displayState) {
+                displayToggle(true);
+                displayState = true;
+            }
+            displayTime = millis();
+        }
 
         void longPress1() {
             menuTime = millis();
@@ -90,6 +101,8 @@
                     userButton3.tick();
                     userButton4.tick();
                 #endif
+            } else {
+                userButton.tick();     // wake the screen only
             }
         }
 
@@ -104,6 +117,10 @@
                     userButton3.attachClick(singlePress3);
                     userButton4.attachClick(singlePress4);
                 #endif
+            } else {
+                userButton.attachClick(wakeOnly);
+                userButton.attachLongPressStart(wakeOnly);
+                userButton.attachDoubleClick(wakeOnly);
             }
         }
 
