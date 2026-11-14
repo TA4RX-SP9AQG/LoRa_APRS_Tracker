@@ -1,6 +1,6 @@
 {
   "version": "4.0.1-tb1",
-  "built": "2026-11-09",
+  "built": "2026-11-14",
   "tested_on_hardware": false,
   "files": {
     "en": [
@@ -25,8 +25,8 @@
       {
         "name": "firmware.bin",
         "offset": 65536,
-        "size": 1469552,
-        "sha256": "e3b82bb4d852ab7801c2a4ce9eb396f2dd63ad72a950eba0f0962deead60dd57"
+        "size": 1469616,
+        "sha256": "6f9a9f5bdbb52901db09bf0e55226b4d676abb70e88ed84934d277498b4f8dfc"
       }
     ],
     "tr": [
@@ -51,8 +51,8 @@
       {
         "name": "firmware.bin",
         "offset": 65536,
-        "size": 1469952,
-        "sha256": "59f5022cd136bb3e23bb2a02d5040ab8d63c05028591a05fedfe133e07803a22"
+        "size": 1470016,
+        "sha256": "445f31f05e908c1d7abf08c8bca12bc14cb30984cd875323d8644dd5dab50234"
       }
     ]
   }

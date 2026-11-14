@@ -221,6 +221,11 @@ namespace {
             readSettings(base);    // the settings as they are right now
             Configuration copy = Config;
             applySettings(controller.staged(), base, copy);
+            #ifndef HAS_BT_CLASSIC
+                // The app talks over Bluetooth, so after a set-up from the app it must stay on at the next start too.
+                copy.bluetooth.active = true;
+                copy.bluetooth.useBLE = true;
+            #endif
             if (saveChecked(copy)) {
                 restartPlanned = true;
                 restartAtMs = now + TB_RESTART_DELAY_MS;

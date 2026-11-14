@@ -158,6 +158,21 @@ void setup() {
     WiFi.mode(WIFI_OFF);
     logger.log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, "Main", "WiFi controller stopped");
 
+    #ifndef HAS_BT_CLASSIC
+        // TrackBridge: a tracker that has never been set up (every callsign is still NOCALL) starts with Bluetooth on,
+        // whatever an older settings file says, so the first set-up can be done from the app. Not saved.
+        if (!bluetoothActive) {
+            bool allNocall = !Config.beacons.empty();
+            for (size_t i = 0; i < Config.beacons.size(); i++) {
+                if (!APRSPacketLib::checkNocall(Config.beacons[i].callsign)) allNocall = false;
+            }
+            if (allNocall) {
+                bluetoothActive = true;
+                Config.bluetooth.useBLE = true;
+            }
+        }
+    #endif
+
     if (bluetoothActive) {
         if (Config.bluetooth.useBLE) {
             BLE_Utils::setup();
