@@ -294,6 +294,8 @@ bool applyAll(JsonObjectConst cmd, EditableSettings& s, char* bad, bool& any) {
             s.radioSet = true;
         } else if (!strcmp(k, "tnc")) {
             if (!readIntAsInt(v, 0, 3, s.tncMode)) { setField(bad, nullptr, k); return false; }
+        } else if (!strcmp(k, "sec")) {
+            if (!readIntAsInt(v, 0, 1, s.secureLink)) { setField(bad, nullptr, k); return false; }
         } else {
             setField(bad, nullptr, k);
             return false;

@@ -60,6 +60,7 @@ static TB::InfoData sampleInfo() {
     d.freeHeap = 123456;
     d.tncMode = 3;
     d.tncEffective = 1;
+    d.secureLink = 1;
     d.radioIndex = 1;
     return d;
 }

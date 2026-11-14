@@ -20,6 +20,7 @@
 #include <ArduinoJson.h>
 #include <NimBLEDevice.h>
 #include <SPIFFS.h>
+#include <esp_random.h>
 #include <string.h>
 #include <vector>
 #include "configuration.h"
@@ -56,6 +57,23 @@ namespace {
     uint32_t                pendingEpoch = 0;
 
     TB::Controller          controller;
+
+    // Link pairing code (secure link mode), set by the Bluetooth task and shown by the main loop.
+    portMUX_TYPE            linkMux = portMUX_INITIALIZER_UNLOCKED;
+    uint32_t                linkKey = 0;
+    uint32_t                linkUntilMs = 0;
+    constexpr uint32_t      kLinkKeyShowMs = 60000;
+
+    bool linkKeyActive(uint32_t now, uint32_t* key, uint32_t* remainingMs) {
+        portENTER_CRITICAL(&linkMux);
+        const bool active = linkKey != 0 && static_cast<int32_t>(linkUntilMs - now) > 0;
+        if (active) {
+            if (key) *key = linkKey;
+            if (remainingMs) *remainingMs = linkUntilMs - now;
+        }
+        portEXIT_CRITICAL(&linkMux);
+        return active;
+    }
     uint32_t                restartAtMs = 0;
     bool                    restartPlanned = false;
     char                    resultBuf[TB::kMaxPayload + 4];
@@ -119,6 +137,7 @@ namespace {
         strlcpy(s.btName, Config.bluetooth.deviceName.c_str(), sizeof(s.btName));
         s.telemetry = Config.telemetry.active;
         s.tncMode = Config.tncMode;
+        s.secureLink = Config.secureLink;
         s.radioIndex = loraIndex;
     }
 
@@ -194,6 +213,7 @@ namespace {
         if (differs(staged.btName, base.btName)) c.bluetooth.deviceName = staged.btName;
         if (staged.telemetry != base.telemetry) c.telemetry.active = staged.telemetry;
         if (staged.tncMode != base.tncMode) c.tncMode = staged.tncMode;
+        if (staged.secureLink != base.secureLink) c.secureLink = staged.secureLink;
     }
 
     const char* kSettingsFile = "/tracker_conf.json";
@@ -315,7 +335,7 @@ namespace TB_BLE_CONTROL {
 
     void setup(NimBLEService* service) {
         if (!service) return;
-        NimBLECharacteristic* control = service->createCharacteristic(TB_CONTROL_UUID, NIMBLE_PROPERTY::WRITE);
+        NimBLECharacteristic* control = service->createCharacteristic(TB_CONTROL_UUID, Config.secureLink == 1 ? (NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_AUTHEN) : NIMBLE_PROPERTY::WRITE);
         resultChr = service->createCharacteristic(TB_RESULT_UUID, NIMBLE_PROPERTY::READ);
         control->setCallbacks(new ControlCallbacks());
         static const uint8_t zeros[TB::kMaxPayload] = {0};
@@ -360,12 +380,34 @@ namespace TB_BLE_CONTROL {
         if (have) handleCommand(cmd, len, conn);
     }
 
+    uint32_t newLinkPasskey() {
+        const uint32_t key = 100000u + (esp_random() % 900000u);    // six digits, never starting with 0
+        portENTER_CRITICAL(&linkMux);
+        linkKey = key;
+        linkUntilMs = millis() + kLinkKeyShowMs;
+        portEXIT_CRITICAL(&linkMux);
+        return key;
+    }
+
     bool pinActive() {
-        return controller.pinActive(millis());
+        const uint32_t now = millis();
+        return controller.pinActive(now) || linkKeyActive(now, nullptr, nullptr);
     }
 
     bool drawPinScreen() {
         const uint32_t now = millis();
+        uint32_t key = 0;
+        uint32_t remainingMs = 0;
+        if (linkKeyActive(now, &key, &remainingMs)) {
+            displayTime = now;
+            if (!displayState) {
+                displayState = true;
+                displayToggle(true);
+            }
+            displayShow("TRACKBRIDGE", TB_T("Link code:", "Baglanti kodu:"), String(key),
+                        TB_T("Type it on the phone", "Telefona yazin"), String((remainingMs + 999u) / 1000u) + " s", "", 0);
+            return true;
+        }
         if (!controller.pinActive(now)) return false;
         displayTime = now;                 // keep the screen on (eco mode would switch it off after a few seconds)
         if (!displayState) {

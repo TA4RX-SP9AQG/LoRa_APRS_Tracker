@@ -42,7 +42,11 @@ namespace TB_BLE_CONTROL {
     TB::TxPolicy txPolicy();
     int tncEffective();
 
-    // True while a pairing PIN is on the screen (other full-screen messages must wait).
+    // Secure link mode (Config.secureLink): a phone that starts pairing needs the code returned here, which is shown on the
+    // screen for a minute. Called from the Bluetooth task.
+    uint32_t newLinkPasskey();
+
+    // True while a pairing PIN or link code is on the screen (other full-screen messages must wait).
     bool pinActive();
 
     // Called by the screen code before it draws: shows the pairing PIN while one is active and returns true.

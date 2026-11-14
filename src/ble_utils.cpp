@@ -56,13 +56,31 @@ String  kissSerialBuffer        = "";
 
 class MyServerCallbacks : public NimBLEServerCallbacks {
     void onConnect(NimBLEServer* pServer) {
-        bluetoothConnected = true;
-        TB_BLE_CONTROL::connectionChanged();
+        if (Config.secureLink != 1) {                  // secure link: counts as connected only once the pairing succeeded
+            bluetoothConnected = true;
+            TB_BLE_CONTROL::connectionChanged();
+        }
         logger.log(logging::LoggerLevel::LOGGER_LEVEL_INFO, "BLE", "%s", "BLE Client Connected");
         #ifdef RPC_MicroTracker
             digitalWrite(13, LOW);    // Led BT/BLE
         #endif
         delay(100);
+    }
+
+    // Secure link mode: the phone started pairing; the code it must type is shown on the tracker screen.
+    uint32_t onPassKeyRequest() {
+        return TB_BLE_CONTROL::newLinkPasskey();
+    }
+
+    void onAuthenticationComplete(ble_gap_conn_desc* desc) {
+        if (Config.secureLink != 1 || desc == nullptr) return;
+        if (desc->sec_state.encrypted && desc->sec_state.authenticated) {
+            bluetoothConnected = true;
+            TB_BLE_CONTROL::connectionChanged();
+            logger.log(logging::LoggerLevel::LOGGER_LEVEL_INFO, "BLE", "%s", "BLE link paired");
+        } else {
+            logger.log(logging::LoggerLevel::LOGGER_LEVEL_WARN, "BLE", "%s", "BLE pairing failed");
+        }
     }
 
     void onDisconnect(NimBLEServer* pServer) {
@@ -146,6 +164,10 @@ namespace BLE_Utils {
     void setup() {
         String BLEid = Config.bluetooth.deviceName;
         BLEDevice::init(BLEid.c_str());
+        if (Config.secureLink == 1) {                                  // TrackBridge: pair with a code shown on the screen
+            NimBLEDevice::setSecurityAuth(true, true, true);           // bonding, man-in-the-middle protection, LE Secure Connections
+            NimBLEDevice::setSecurityIOCap(BLE_HS_IO_DISPLAY_ONLY);    // the tracker shows the code, the phone asks for it
+        }
         pServer = BLEDevice::createServer();
         pServer->setCallbacks(new MyServerCallbacks());
 
@@ -154,8 +176,9 @@ namespace BLE_Utils {
         //  KISS (AX.25) or TNC2
         bool useKISS = Config.bluetooth.useKISS;
         pService = pServer->createService(useKISS ? SERVICE_UUID_0 : SERVICE_UUID_1);
-        pCharacteristicTx = pService->createCharacteristic(useKISS ? CHARACTERISTIC_UUID_TX_0 : CHARACTERISTIC_UUID_TX_1, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
-        pCharacteristicRx = pService->createCharacteristic(useKISS ? CHARACTERISTIC_UUID_RX_0 : CHARACTERISTIC_UUID_RX_1, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
+        pCharacteristicTx = pService->createCharacteristic(useKISS ? CHARACTERISTIC_UUID_TX_0 : CHARACTERISTIC_UUID_TX_1, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY | (Config.secureLink == 1 ? NIMBLE_PROPERTY::READ_AUTHEN : 0));
+        pCharacteristicRx = pService->createCharacteristic(useKISS ? CHARACTERISTIC_UUID_RX_0 : CHARACTERISTIC_UUID_RX_1,
+                                                           NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR | (Config.secureLink == 1 ? NIMBLE_PROPERTY::WRITE_AUTHEN : 0));
 
         if (pService != nullptr) {
             pCharacteristicRx->setCallbacks(new MyCallbacks());

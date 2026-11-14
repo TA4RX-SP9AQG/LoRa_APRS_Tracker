@@ -144,6 +144,7 @@ public:
     bool    disableGPS;
     bool    cadActive;
     int     tncMode;            // TrackBridge: 0 normal, 1 full TNC, 2 semi TNC, 3 smart (see tb_tnc.h)
+    int     secureLink;         // TrackBridge: 1 = a phone must pair with a code shown on the screen before it can write
 
     void setDefaultValues();
     bool writeFile();

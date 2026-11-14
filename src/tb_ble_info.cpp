@@ -141,6 +141,7 @@ namespace {
         d.storedMessages = MSG_Utils::getNumAPRSMessages();
         d.freeHeap = ESP.getFreeHeap();
         d.tncMode = Config.tncMode;
+        d.secureLink = Config.secureLink;
         d.radioIndex = loraIndex;
         d.tncEffective = TB_BLE_CONTROL::tncEffective();
         publish(infoChr, infoBuf, TB::buildInfo(d, infoBuf, TB::kMaxPayload));

@@ -89,11 +89,23 @@ work, because the tracker sends no beacons to read the position from. The tracke
 battery row: `FULL`, `SEMI` or `AUTO` (Smart); nothing in Normal mode, and nothing when the row has no room left
 (it needs 5 free characters; the Heltec Wireless Tracker row is 26 characters wide).
 
+### Secure link (optional, off by default)
+
+Setting `bluetooth.secure` (app: "Güvenli bağlantı" / "Secure link", needs the PIN and a restart) makes the tracker require
+**pairing with a six-digit code shown on its screen** (Bluetooth LE Secure Connections with a passkey, bonding kept) before a
+phone can write to the KISS characteristic or the control characteristic, or read the radio-to-phone data. Without it the stock
+behaviour stays (open). In this mode a phone counts as "connected" (Smart TNC mode, screen symbol) only after the pairing
+succeeded, so a stranger's phone can no longer silence the beacons. Tracker-side files: `src/ble_utils.cpp` (security
+settings, characteristic flags, callbacks), `src/tb_ble_control.cpp` (code generation and screen).
+**Not tested on a real tracker yet.** If a phone cannot pair, remove the old pairing in the phone's Bluetooth settings and
+try again; if the setting must be undone without a connection, flash with "Erase device". The iOS aprs.fi app and other
+generic BLE KISS clients do not support passkey pairing from this firmware's point of view as tested; leave the option off for them.
+
 ### Known limits
 
-* **The KISS characteristic has no authentication** (as in the original firmware): anyone within Bluetooth range can make a
-  tracker with Bluetooth on transmit. With the new default (Bluetooth on from the start) that is also true for a fresh tracker.
-  Gating KISS transmit behind the same PIN session, or LE Secure Connections with a passkey, is the proper fix and not done yet.
+* **The KISS characteristic has no authentication unless the Secure link option is switched on** (as in the original firmware):
+  anyone within Bluetooth range can make a tracker with Bluetooth on transmit. With the default (Bluetooth on from the start)
+  that is also true for a fresh tracker. Switch on "Secure link" once the tracker works (see above).
 * The PIN travels unencrypted over the air once; it is single use, so it cannot be replayed, but someone injecting packets into an
   open session with special equipment is not stopped.
 * The settings file is not written atomically; a power cut during the save can lose it (the tracker then starts with the default

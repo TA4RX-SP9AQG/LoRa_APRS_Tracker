@@ -70,6 +70,7 @@ bool Configuration::writeFile() {
         #endif
         data["bluetooth"]["useKISS"]                = bluetooth.useKISS;
         data["bluetooth"]["tncMode"]                = tncMode;
+        data["bluetooth"]["secure"]                 = secureLink;
 
         for (int i = 0; i < loraTypes.size(); i++) {
             data["lora"][i]["frequency"]                = loraTypes[i].frequency;
@@ -193,6 +194,7 @@ bool Configuration::readFile() {
         #endif
         tncMode                         = data["bluetooth"]["tncMode"] | 0;      // a file without it (older firmware) means normal
         if (tncMode < 0 || tncMode > 3) tncMode = 0;
+        secureLink                      = (data["bluetooth"]["secure"] | 0) == 1 ? 1 : 0;    // a file without it means open (stock behaviour)
 
         JsonArray LoraTypesArray = data["lora"];
         for (int j = 0; j < LoraTypesArray.size(); j++) {
@@ -344,6 +346,7 @@ void Configuration::setDefaultValues() {
         bluetooth.useKISS           = true;
     #endif
     tncMode                         = 0;
+    secureLink                      = 0;
 
     for (int j = 0; j < 4; j++) {
         LoraType loraType;

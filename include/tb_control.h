@@ -115,6 +115,7 @@ struct EditableSettings {
     char           btName[kBtNameLen];
     bool           telemetry;
     int            tncMode;
+    int            secureLink;    // 1 = pairing with an on-screen code is required for writes
     int            radioIndex;    // active radio profile
     bool           radioSet;      // the app asked for a change of it in this session
 };

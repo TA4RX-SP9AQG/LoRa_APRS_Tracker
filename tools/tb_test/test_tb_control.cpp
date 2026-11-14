@@ -507,6 +507,23 @@ int main() {
         }
     }
 
+    // ---- secure link (pairing with an on-screen code) ----
+    {
+        for (int i = 0; i < 2; i++) {
+            Rig t;
+            t.signIn();
+            const char* json = i == 0 ? "{\"id\":4,\"op\":\"set\",\"sec\":0}" : "{\"id\":4,\"op\":\"set\",\"sec\":1}";
+            TB::CommandResult x = t.send(json);
+            CHECK(x.ok && t.c.staged().secureLink == i, "sec 0/1 is accepted and staged");
+        }
+        const char* no[] = {"{\"id\":4,\"op\":\"set\",\"sec\":-1}", "{\"id\":4,\"op\":\"set\",\"sec\":2}", "{\"id\":4,\"op\":\"set\",\"sec\":\"1\"}", "{\"id\":4,\"op\":\"set\",\"sec\":true}", "{\"id\":4,\"op\":\"set\",\"sec\":0.5}"};
+        for (const char* j : no) {
+            Rig t;
+            t.signIn();
+            CHECK(is(t.send(j), false, "invalid"), "a bad sec value is refused");
+        }
+    }
+
     // ---- adding and removing beacon profiles ----
     {
         Rig t;

@@ -65,6 +65,7 @@ struct InfoData {
     int         tncMode;            // as set (see tb_tnc.h)
     int         radioIndex;         // active radio profile
     int         tncEffective;       // in effect right now
+    int         secureLink;         // 1 = pairing with an on-screen code is required for writes
 };
 
 struct BeaconData {

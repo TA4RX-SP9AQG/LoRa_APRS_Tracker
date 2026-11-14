@@ -276,6 +276,7 @@ size_t buildInfo(const InfoData& d, char* out, size_t cap) {
     w.key("msg");  w.integer(d.storedMessages);
     w.key("heap"); w.unsignedInteger(d.freeHeap);
     w.key("ri");   w.integer(d.radioIndex);
+    w.key("sec");  w.integer(d.secureLink);
     w.key("tnc");
     w.beginObject();
     w.key("m"); w.integer(d.tncMode);
