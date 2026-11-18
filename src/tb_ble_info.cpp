@@ -40,7 +40,7 @@
 #define TB_BEACONS_UUID   "00000016-ba2a-46c9-ae49-01b0961f68bb"
 #define TB_MESSAGES_UUID  "00000013-ba2a-46c9-ae49-01b0961f68bb"
 
-#define TB_FIRMWARE_VERSION  "4.0.1-tb4"
+#define TB_FIRMWARE_VERSION  "4.0.1-tb5"
 #define TB_REFRESH_MS        3000
 #define TB_MESSAGES_FILE     "/aprsMessages.txt"
 #define TB_MESSAGES_TAIL     1600     // bytes read from the end of the file
@@ -127,6 +127,9 @@ namespace {
         d.hdop = gpsFresh && gps.hdop.isValid() ? (float)gps.hdop.hdop() : 0.0f;
         d.speedKmh = gpsFresh && gps.speed.isValid() ? (float)gps.speed.kmph() : 0.0f;
         d.altitudeM = gpsFresh && gps.altitude.isValid() ? (int)gps.altitude.meters() : 0;
+        d.hasPosition = gpsFresh && d.gpsEnabled;
+        d.lat = d.hasPosition ? gps.location.lat() : 0.0;
+        d.lon = d.hasPosition ? gps.location.lng() : 0.0;
         d.gpsAgeS = (gpsAgeMs == 0xFFFFFFFFu || !gps.location.isValid()) ? -1 : (int32_t)(gpsAgeMs / 1000);
         d.lastTxAgoS = lastTxTime == 0 ? -1 : (int32_t)((millis() - lastTxTime) / 1000);
         d.smartBeacon = smartBeaconActive;
@@ -250,10 +253,13 @@ namespace TB_BLE {
         if (!server) return;
         NimBLEService* service = server->createService(TB_SERVICE_UUID);
         if (!service) return;
-        infoChr     = service->createCharacteristic(TB_INFO_UUID, NIMBLE_PROPERTY::READ);
-        configChr   = service->createCharacteristic(TB_CONFIG_UUID, NIMBLE_PROPERTY::READ);
-        beaconsChr  = service->createCharacteristic(TB_BEACONS_UUID, NIMBLE_PROPERTY::READ);
-        messagesChr = service->createCharacteristic(TB_MESSAGES_UUID, NIMBLE_PROPERTY::READ);
+        // With the secure link switched on, reading the status (it carries the position), the settings and the stored messages
+        // needs the pairing too.
+        const uint32_t readFlags = Config.secureLink == 1 ? (NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::READ_AUTHEN) : NIMBLE_PROPERTY::READ;
+        infoChr     = service->createCharacteristic(TB_INFO_UUID, readFlags);
+        configChr   = service->createCharacteristic(TB_CONFIG_UUID, readFlags);
+        beaconsChr  = service->createCharacteristic(TB_BEACONS_UUID, readFlags);
+        messagesChr = service->createCharacteristic(TB_MESSAGES_UUID, readFlags);
         TB_BLE_CONTROL::setup(service);    // change settings from the app (needs the PIN shown on the tracker)
         service->start();
         // Reserve the full size once, so later updates never reallocate while a phone is reading.

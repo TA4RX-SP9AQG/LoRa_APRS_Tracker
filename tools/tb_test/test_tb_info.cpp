@@ -47,6 +47,9 @@ static TB::InfoData sampleInfo() {
     d.hdop = 1.234f;
     d.speedKmh = 3.46f;
     d.altitudeM = 210;
+    d.hasPosition = true;
+    d.lat = -33.86882;
+    d.lon = 151.20929;
     d.gpsAgeS = 2;
     d.lastTxAgoS = 55;
     d.smartBeacon = true;

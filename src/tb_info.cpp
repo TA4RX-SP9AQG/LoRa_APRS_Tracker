@@ -264,6 +264,10 @@ size_t buildInfo(const InfoData& d, char* out, size_t cap) {
     w.key("kmh"); w.number(d.speedKmh, 1);
     w.key("alt"); w.integer(d.altitudeM);
     w.key("age"); w.integer(d.gpsAgeS);
+    if (d.hasPosition && d.gpsFix && d.lat >= -90.0 && d.lat <= 90.0 && d.lon >= -180.0 && d.lon <= 180.0) {    // only with a fresh fix
+        w.key("lat"); w.number(d.lat, 5);
+        w.key("lon"); w.number(d.lon, 5);
+    }
     w.endObject();
     w.key("tx");
     w.beginObject();

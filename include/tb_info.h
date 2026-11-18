@@ -51,6 +51,9 @@ struct InfoData {
     float       hdop;
     float       speedKmh;
     int         altitudeM;
+    bool        hasPosition;        // a fresh fix: latitude and longitude follow
+    double      lat;
+    double      lon;
     int32_t     gpsAgeS;            // seconds since the last position update, -1 unknown
     int32_t     lastTxAgoS;         // seconds since the last transmission, -1 never
     bool        smartBeacon;

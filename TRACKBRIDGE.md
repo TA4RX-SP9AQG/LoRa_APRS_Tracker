@@ -89,6 +89,15 @@ work, because the tracker sends no beacons to read the position from. The tracke
 battery row: `FULL`, `SEMI` or `AUTO` (Smart); nothing in Normal mode, and nothing when the row has no room left
 (it needs 5 free characters; the Heltec Wireless Tracker row is 26 characters wide).
 
+### GPS position in the status (4.0.1-tb5)
+
+The status characteristic now also carries `"lat"` and `"lon"` inside `"gps"`, **only while the GPS has a fresh fix**. The app uses it for the
+automatic beacon with the tracker's GPS as the position source (before, it could only learn the position from the tracker's own
+beacons, which come at the tracker's beacon interval and never in Full TNC mode) and shows the satellites and the fix state on its
+main screen. Privacy: the status can be read by any phone that connects to the tracker's Bluetooth. The same position is public
+anyway when the tracker beacons on the radio, but in Full TNC mode it is not, so switch on the **secure link** (below): with it, the
+status, settings and stored messages can only be read after pairing with the code shown on the tracker's screen.
+
 ### Secure link (optional, off by default)
 
 Setting `bluetooth.secure` (app: "Güvenli bağlantı" / "Secure link", needs the PIN and a restart) makes the tracker require
